@@ -25,7 +25,7 @@ area of interest is the City of Philadelphia, which is contains roughly
 23 thousand points of interest according to SafeGraph, including 5,100
 restaurants—the most common category.
 
-![](~/Desktop/R/git/philamonitor/viz/pois.png)
+![](https://github.com/asrenninger/philamonitor/raw/master/viz/pois.png)
 
 Should we want to expand our aperature to the larger region, Greater
 Philadelphia spans 11 counties, broken into 4,300 block groups by the
