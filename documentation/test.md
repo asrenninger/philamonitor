@@ -1,31 +1,34 @@
-R Markdown
-----------
+Methods
+=======
 
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see
-<a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.
+**Line of inquiry:**
 
-When you click the **Knit** button a document will be generated that
-includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
+-   **Transit:** Where are Philadelphians moving to and from through the
+    City? Where and when are these flows emerging? How do today’s flow
+    compare at baseline?
+-   **Economy:** What are the emerging centers of economic opportunity
+    over time and how do these clusters compare to baseline?
+-   **Risk:** Where are Philadelphians crowding, relative to available
+    space indoors and outdoors?
 
-    summary(cars)
+Data
+----
 
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
+The data that we will use in this study come from `SafeGraph`, a
+provider of location data, which produces twin datasets—places and
+patterns—that combine to track the flow of mobile phones between
+residences and points of interest, like restaurants and bars. This study
+will focus on Philadelphia and consider the role of location data in
+aiding its opening as the impact of the novel coronavirus attenuates.
+Because we want to consider policy in our analysis, the natural unit of
+area of interest is the City of Philadelphia, which is contains roughly
+23 thousand points of interest according to SafeGraph, including 5,100
+restaurants—the most common category.
 
-Including Plots
----------------
+![](~/Desktop/R/git/philamonitor/viz/pois.png)
 
-You can also embed plots, for example:
-
-![](test_files/figure-markdown_strict/pressure-1.png)
-
-Note that the `echo = FALSE` parameter was added to the code chunk to
-prevent printing of the R code that generated the plot.
+Should we want to expand our aperature to the larger region, Greater
+Philadelphia spans 11 counties, broken into 4,300 block groups by the
+Census Bureau. Taking this as our area of interest, there are 98,000
+unique points of interest to examine, with predominant categories
+including restaurants (16,100), doctors (4,800) or dentists (3,100).
