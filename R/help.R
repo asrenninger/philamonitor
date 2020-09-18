@@ -7,7 +7,7 @@
 ## Palettes
 
 # Base
-pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/turbo.txt", col_names = FALSE) %>% pull(X1)
+pal <- read_csv("https://github.com/asrenninger/philamonitor/raw/master/miscellany/pal.txt", col_names = FALSE) %>% pull(X1)
 
 ## Themes
 
@@ -218,19 +218,10 @@ labeller <- function(values, max) {
   return(miniaturise)
 }
 
-#
-
 ## Wrappers
 
 # magrittr
 use <- function(label) { return(magrittr::use_series(label)) }
-
-## Timeseries
-
-peaker <- function(day, hour) {
-  as.numeric(((hour >=7 & hour <=10) | (hour >=18 & hour <=20)) & (str_detect(day, "Mon|Tue|Wed|Thu|Fri")))
-}
-
 
 
 

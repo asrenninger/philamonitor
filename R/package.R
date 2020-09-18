@@ -7,6 +7,7 @@
 library(tidyverse)
 library(janitor)
 library(vroom)
+library(fs)
 library(data.table)
 library(dtplyr)
 library(glue)
