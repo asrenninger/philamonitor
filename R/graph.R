@@ -1,3 +1,10 @@
+########################################
+## Graphing
+########################################
+
+source("R/package.R")
+source("R/help.R")
+
 new <- 
   flo %>% 
   select(safegraph_place_id, visitor_home_cbgs) %>%
@@ -109,24 +116,46 @@ decomp <- decompose(graph, mode = c("weak"),
                     min.vertices = 2)
 
 lay <- layout_with_fr(decomp[[1]], weights = E(decomp[[1]])$weight)
+lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+
+png(width = 1800, height = 1800)
 
 plot(
+  main = "points of interests and neighborhood interactions",
   decomp[[1]],
-  layout = lay, 
+  rescale = FALSE, 
+  ylim = c(-1, 1), 
+  xlim = c(-1, 1), 
+  asp = 0,
+  layout = lay * 1, 
   vertex.size = sqrt(degree(decomp[[1]])),
   vertex.label = NA,
   edge.arrow.size = 0,
   vertex.color = V(decomp[[1]])$cmap
 )
 
+dev.off()
+
+lay <- layout_as_bipartite(decomp[[1]])
+lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+
+png(width = 1800, height = 1800)
+
 plot(
+  main = "points of interests and neighborhood interactions",
   decomp[[1]],
-  layout = layout.bipartite, 
+  rescale = FALSE, 
+  ylim = c(-1, 1), 
+  xlim= c(-1, 1), 
+  layout = lay, 
   vertex.size = degree(decomp[[1]])/100 + 1,
   vertex.label = NA,
   edge.arrow.size = 0,
+  edge.color = adjustcolor('#757575', 0.1),
   vertex.color = V(decomp[[1]])$cmap
 )
+
+dev.off()
 
 ##
 
@@ -134,13 +163,14 @@ library(ggraph)
 
 ##
 
-plot <- ggraph(decomp[[1]], layout = lay) +
-  geom_edge_link(size = 0.5) + 
-  geom_node_point(aes(colour = description, size = weight)) +
+net <- 
+  ggraph(decomp[[1]], layout = lay) +
+  geom_edge_link() + 
+  geom_node_point(aes(colour = description, size = sqrt(degree(decomp[[1]])))) +
   coord_fixed() +
   scale_color_manual(values = col$cmap)
 
-gggsave(plot, "test.png", height = 8, width = 8, dpi = 300)
+ggsave(net, filename = "graph.png", height = 20, width = 20, dpi = 300)
 
 ##
 
