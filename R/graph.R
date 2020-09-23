@@ -5,6 +5,8 @@
 source("R/package.R")
 source("R/help.R")
 
+##
+
 new <- 
   flo %>% 
   select(safegraph_place_id, visitor_home_cbgs) %>%
@@ -33,7 +35,8 @@ sgl <-
   st_drop_geometry()
 
 mat <- 
-  new %>% left_join(sgl) %>%
+  new %>% 
+  left_join(sgl) %>%
   drop_na(naics)
 
 rel <- transmute(mat,from = cbg, to = safegraph_place_id, weight = visits)
@@ -92,9 +95,9 @@ graph <-
   set_vertex_attr("description", index = V(graph)[type=="TRUE"], value = nde$class) %>%
   set_vertex_attr("naics", index = V(graph)[type=="TRUE"], value = nde$naics) %>%
   set_vertex_attr("cmap", index = V(graph)[type=="TRUE"], value = nde$cmap) %>%
-  set_vertex_attr("venue", index = V(graph)[type=="FALSE"], value = "none")  %>% 
-  set_vertex_attr("description", index = V(graph)[type=="FALSE"], value = "none") %>%
-  set_vertex_attr("naics", index = V(graph)[type=="FALSE"], value = "none") %>%
+  set_vertex_attr("venue", index = V(graph)[type=="FALSE"], value = "")  %>% 
+  set_vertex_attr("description", index = V(graph)[type=="FALSE"], value = "") %>%
+  set_vertex_attr("naics", index = V(graph)[type=="FALSE"], value = "") %>%
   set_vertex_attr("cmap", index = V(graph)[type=="FALSE"], value = '#000000') %>%
   set_vertex_attr("comp", value = comps$membership)
 
@@ -115,7 +118,7 @@ graph <- simplify(graph)
 decomp <- decompose(graph, mode = c("weak"),
                     min.vertices = 2)
 
-lay <- layout_with_fr(decomp[[1]], weights = E(decomp[[1]])$weight)
+lay <- layout_with_graphopt(decomp[[1]])#, weights = E(decomp[[1]])$weight)
 lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
 
 png(width = 1800, height = 1800)
@@ -189,5 +192,44 @@ plot(
   vertex.color = tween
 )
 
+##
 
+library(photobiology)
+
+##
+
+spect <- spectrum(as.undirected(graph))
+
+spectibl <- 
+  tibble(value = spect[[3]][, 1]) %>%
+  mutate(spectral = rescale(value, to = c(400, 700))) %>%
+  mutate(hex = w_length2rgb(spectral)) %>%
+  arrange(spectral)
+
+options(scipen = 999)
+
+ggplot(data = spectibl) +
+  geom_bar(aes(x = spectral, y = 100, fill = hex), stat = 'identity') +
+  scale_fill_manual(values = unique(spectibl$hex), guide = 'none') +
+  theme_void() + 
+  ggsave("spectrum.png", height = 6, width = 8, dpi = 300)
+
+##
+
+map <- 
+  nde %>%
+  distinct(safegraph_place_id, .keep_all = TRUE) %>%
+  left_join(phl) %>%
+  select(safegraph_place_id, class, locale, n, cmap,  latitude, longitude) %>% 
+  mutate(`number of visits` = n) %>%
+  st_as_sf(coords = c("longitude", "latitude"), remove =  FALSE) %>%
+  tm_shape() +
+  tm_dots(col = "cmap", size = "number of visits", scale = 0.5) +
+  tm_layout("Points of interest, Philadelphia",
+            title.fontface = 'bold',
+            frame.lwd = 0)
+
+tmap_save(map, "mapped.png", height = 8, width = 8, dpi = 300)
+
+##
 
