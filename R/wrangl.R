@@ -130,7 +130,7 @@ tmap_save(map, "devices.png", height = 8, width = 8, dpi = 300)
 
 ##
 
-files <- dir_ls("data/patterns_2020/2020/09/09/18")
+files <- dir_ls("data/patterns_2020_weekly/2020/09/09/18")
 files <- files[2:5]
 
 ##

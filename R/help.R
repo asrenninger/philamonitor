@@ -99,6 +99,30 @@ theme_map <- function () {
   
 }
 
+theme_map <- function () {
+  theme_void() + 
+    theme(plot.background = element_rect(fill = 'transparent', colour = 'transparent'),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          axis.line.x = element_blank(),
+          axis.line.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          legend.title = element_text(colour = 'black'),
+          legend.text = element_text(colour = 'black'),
+          plot.title = element_text(face = 'bold', colour = 'black', hjust = 0.5),
+          plot.subtitle =  element_text(face = 'plain', colour = 'black', size = 15, hjust = 0.5),
+          panel.grid.major = element_line(size = NA), 
+          panel.grid.minor = element_line(size = NA),
+          legend.position = c(0.8, 0.2),
+          plot.margin = margin(20, 20, 20, 20)
+    )
+  
+}
 
 ## Guides
 
