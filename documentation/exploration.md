@@ -8,6 +8,11 @@ maps and tables.
 Points of Interest
 ------------------
 
+We can start by looking at which points of interest were most popular in
+the beginning of the year and how that is changed in recent months. The
+table below shows just that, alongside a map that generally conveys that
+distribution locations across Philadelphia.
+
 <table>
 <thead>
 <tr class="header">
@@ -18,17 +23,47 @@ Points of Interest
 <tbody>
 <tr class="odd">
 <td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png" /></td>
+<td style="text-align: center;"></td>
 </tr>
 </tbody>
 </table>
 
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png)
+
+The airport fell in the ranks, though all others saw few visitors in
+August than in January—even more striking when we consider weather,
+which could have produced the opposite effect in other years. Malls and
+shopping centers appear to have weathered the pandemic well, but the
+shift to remote work should also appear in the data. We can look at
+visits to the Comcast Center and the Plaza below it; visits in April and
+May, as the coronavirus took hold in the city, fell to the point of
+irrelevance.
+
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/comcast.png)
+
+Yet with offices vacant, parks should have swelled with visitors. We see
+mixed evidence of this in the data. Philadelphia has four central
+squares—Rittenhouse, Washington, Logan, and Franklin—which provide
+important community amenity; all saw fewer visits in April and May than
+later in the summer, suggesting winter patterns even as the weather
+improved.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/parks.png)
 
 Aggregations
 ------------
+
+Perhaps more valuable than probing individual points of interest is
+aggregating by areal units. Philadelphia has roughly 150 neighborhoods
+(we use
+[definitions](https://github.com/azavea/geo-data/tree/master/Neighborhoods_Philadelphia)
+from local firm Azavea) and each responded differently to the pandemic.
+Neighborhoods dominated by office work, like the Navy Yard along with
+Logan Square and Center City, saw precipitous declines in foot traffic,
+but those with strong amenities and residential communities have
+recovered. This suggests that demand for food, drink, and shopping may
+be shifting away from the core. (Note: see the appendix for larger
+tables.)
 
 <table>
 <thead>
@@ -45,6 +80,15 @@ Aggregations
 </tbody>
 </table>
 
+Using regular tesselations, we can aggregate to a grid of 500 meter
+cells to see how this manifests across space. We are still aggregating
+from points of interest, so this is visits to businesses, parks, museums
+and the like, but by tile; this does not include visits to the
+particular patch of land without setting foot in a point of interest.
+The city hollowed out during the worst months of the pandemic but the
+Old City, Center City, University City axis still appears to have
+pockets of thriving activity in these maps.
+
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
 Appendix:
@@ -60,7 +104,9 @@ Appendix:
 <tbody>
 <tr class="odd">
 <td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top20.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png" /></td>
+<td style="text-align: center;"></td>
 </tr>
 </tbody>
 </table>
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png)
