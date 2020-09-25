@@ -14,8 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 With the goal of understanding the time-space patterns of resident movement in Philadelphia, the following section presents a series of maps and tables. 
 
 ## Points of Interest
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)
+ Rankings             |  Locations
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png) 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/comcast.png)
 
@@ -25,8 +26,16 @@ With the goal of understanding the time-space patterns of resident movement in P
 
 Best             |  Worst
 :-------------------------:|:-------------------------:
-!![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png)| ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png)
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png)| ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png)
 
- 
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
+
+
+
+## Appendix: 
+
+ Best             |  Worst
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top20.png)| ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png)
 
 
