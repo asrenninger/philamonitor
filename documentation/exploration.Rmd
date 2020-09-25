@@ -41,6 +41,10 @@ Using regular tesselations, we can aggregate to a grid of 500 meter cells to see
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
+We can also aggregate by use, grouping by classes like leisure and tourisms. Below we define leisure as visits to restaurants and bars, and see that there are distinct changes in the flow between March and April using a technique called change point detect. 
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changepoints.png)
+
 ## Appendix: 
 
  Best             |  Worst

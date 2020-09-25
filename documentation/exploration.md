@@ -89,6 +89,13 @@ pockets of thriving activity in these maps.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
+We can also aggregate by use, grouping by classes like leisure and
+tourisms. Below we define leisure as visits to restaurants and bars, and
+see that there are distinct changes in the flow between March and April
+using a technique called change point detect.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changepoints.png)
+
 Appendix:
 ---------
 
