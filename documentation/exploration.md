@@ -17,5 +17,6 @@ Points of Interest
 Aggregations
 ------------
 
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png)
+:————————-:|:————————-:
+!![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png)|
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png)
