@@ -23,12 +23,10 @@ distribution locations across Philadelphia.
 <tbody>
 <tr class="odd">
 <td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png" /></td>
-<td style="text-align: center;"></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png" /></td>
 </tr>
 </tbody>
 </table>
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png)
 
 The airport fell in the ranks, though all others saw few visitors in
 August than in January—even more striking when we consider weather,
@@ -104,9 +102,7 @@ Appendix:
 <tbody>
 <tr class="odd">
 <td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top20.png" /></td>
-<td style="text-align: center;"></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png" /></td>
 </tr>
 </tbody>
 </table>
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png)

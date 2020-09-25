@@ -19,8 +19,7 @@ We can start by looking at which points of interest were most popular in the beg
 
  Rankings             |  Locations
 :-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png) 
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png) 
 
 The airport fell in the ranks, though all others saw few visitors in August than in January—even more striking when we consider weather, which could have produced the opposite effect in other years. Malls and shopping centers appear to have weathered the pandemic well, but the shift to remote work should also appear in the data. We can look at visits to the Comcast Center and the Plaza below it; visits in April and May, as the coronavirus took hold in the city, fell to the point of irrelevance. 
 
@@ -46,8 +45,7 @@ Using regular tesselations, we can aggregate to a grid of 500 meter cells to see
 
  Best             |  Worst
 :-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top20.png)|
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png)
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top20.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png)
 
 
 
