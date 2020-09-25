@@ -23,6 +23,7 @@ With the goal of understanding the time-space patterns of resident movement in P
 
 ## Aggregations
 
+Best             |  Worst
 :-------------------------:|:-------------------------:
 !![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png)| ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png)
 

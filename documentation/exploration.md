@@ -17,6 +17,17 @@ Points of Interest
 Aggregations
 ------------
 
-:————————-:|:————————-:
-!![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png)|
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png)
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Best</th>
+<th style="text-align: center;">Worst</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">!<img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png" /></td>
+</tr>
+</tbody>
+</table>
