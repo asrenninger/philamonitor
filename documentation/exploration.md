@@ -3,7 +3,11 @@ Exploration
 
 With the goal of understanding the time-space patterns of resident
 movement in Philadelphia, the following section presents a series of
-maps and tables.
+maps and tables. Note that SafeGraph captures a slice of the population,
+attempting to monitor a representative sample of the population across
+the country; that said, we can reduce noise through various aggregations
+and by tracking trends, which are naturally indexed to population of
+devices rather than the population as a whole.
 
 Points of Interest
 ------------------
