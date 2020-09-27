@@ -8,6 +8,13 @@ maps and tables.
 Points of Interest
 ------------------
 
+First, we can classify each point of interest by its description. If it
+contains restuarant or bar, we call that leisure. Anything educational,
+from tutoring to public, private or charter schools to tertiary
+education, we call that education. Tourism includes museums and parks.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
+
 We can start by looking at which points of interest were most popular in
 the beginning of the year and how that is changed in recent months. The
 table below shows just that, alongside a map that generally conveys that
