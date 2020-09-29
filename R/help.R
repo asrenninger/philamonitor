@@ -16,17 +16,17 @@ theme_hor <- function () {
   theme_minimal() +
     theme(plot.background = element_rect(fill = 'transparent', colour = 'transparent'),
           panel.grid.major.x = element_blank(),
-          panel.grid.major.y = element_line(size = 0.1, colour = 'grey50'),
+          panel.grid.major.y = element_line(size = 0.1, colour = 'black'),
           panel.grid.minor.x = element_blank(),
           panel.grid.minor.y = element_blank(),
           axis.line.x = element_line(size = 0.5, colour = 'black'),
           axis.line.y = element_blank(),
           axis.ticks.x = element_line(size = 0.5, colour = 'black'),
-          axis.ticks.y = element_line(size = 0.1, colour = 'grey50'),
+          axis.ticks.y = element_line(size = 0.1, colour = 'black'),
           axis.text.x = element_text(face = 'bold'),
           axis.text.y = element_text(face = 'bold'),
-          plot.title = element_text(face = 'bold', colour = 'grey50'),
-          plot.subtitle =  element_text(face = 'plain', colour = 'black', size = 15),
+          plot.title = element_text(face = 'bold', colour = 'black', hjust = 0.5),
+          plot.subtitle =  element_text(face = 'plain', colour = 'black', size = 15, hjust = 0.5),
           strip.text = element_text(face = 'bold', colour = 'black'),
           plot.margin = margin(20, 20, 20, 20)
     )
@@ -36,18 +36,18 @@ theme_hor <- function () {
 theme_rot <- function () {
   theme_minimal() +
     theme(plot.background = element_rect(fill = 'transparent', colour = 'transparent'),
-          panel.grid.major.x = element_line(size = 0.1, colour = 'grey50'),
+          panel.grid.major.x = element_line(size = 0.1, colour = 'black'),
           panel.grid.major.y = element_blank(),
           panel.grid.minor.x = element_blank(),
           panel.grid.minor.y = element_blank(),
           axis.line.y = element_line(size = 0.5, colour = 'black'),
           axis.line.x = element_blank(),
           axis.ticks.y = element_line(size = 0.5, colour = 'black'),
-          axis.ticks.x = element_line(size = 0.1, colour = 'grey50'),
+          axis.ticks.x = element_line(size = 0.1, colour = 'black'),
           axis.text.x = element_text(face = 'bold'),
           axis.text.y = element_text(face = 'bold'),
-          plot.title = element_text(face = 'bold', colour = 'grey50'),
-          plot.subtitle =  element_text(face = 'plain', colour = 'black'),
+          plot.title = element_text(face = 'bold', colour = 'black', hjust = 0.5),
+          plot.subtitle =  element_text(face = 'plain', colour = 'black', size = 15, hjust = 0.5),
           strip.text = element_text(face = 'bold', colour = 'black'),
           plot.margin = margin(20, 20, 20, 20)
     )
@@ -67,14 +67,14 @@ theme_ver <- function () {
           axis.ticks.x = element_line(size = 0.1, colour = 'grey50'),
           axis.text.x = element_text(face = 'bold'),
           axis.text.y = element_text(face = 'bold'),
-          plot.title = element_text(face = 'bold', colour = 'grey50'),
-          plot.subtitle =  element_text(face = 'plain', colour = 'black'),
+          plot.title = element_text(face = 'bold', colour = 'black', hjust = 0.5),
+          plot.subtitle =  element_text(face = 'plain', colour = 'black', size = 15, hjust = 0.5),
           strip.text = element_text(face = 'bold', colour = 'black'),
           plot.margin = margin(20, 20, 20, 20)
     )
 }
 
-theme_map <- function () {
+theme_black <- function () {
   theme_void() + 
     theme(plot.background = element_rect(fill = 'black', colour = 'black'),
           panel.grid.major.x = element_blank(),
@@ -87,9 +87,9 @@ theme_map <- function () {
           axis.ticks.y = element_blank(),
           axis.text.x = element_blank(),
           axis.text.y = element_blank(),
-          legend.title = element_text(colour = 'grey50'),
+          legend.title = element_text(colour = 'black'),
           legend.text = element_text(colour = 'white'),
-          plot.title = element_text(face = 'bold', colour = 'grey50'),
+          plot.title = element_text(face = 'bold', colour = 'black'),
           plot.subtitle =  element_text(face = 'plain', colour = 'white', size = 15),
           panel.grid.major = element_line(size = NA), 
           panel.grid.minor = element_line(size = NA),
