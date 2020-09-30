@@ -5,4 +5,4 @@ Here we use mobility to model Philadelphia's socio-spatial network: how do neigh
 
  January             |  July
 :-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/jan.png)|![]()https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/jul.png
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/jan.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/jul.png)
