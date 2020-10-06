@@ -219,3 +219,140 @@ list.files(path='animations/fairmount', pattern = '*.png', full.names = TRUE) %>
   image_animate(fps = 1) %>% 
   image_write("fairmount.gif")
 
+##
+
+leisure <- 
+  odmat %>% 
+  left_join(sginf) %>%
+  left_join(cross) %>%
+  filter(class == "leisure") %>%
+  select(safegraph_place_id, cbg, visits, month)
+
+##
+
+tig <- 
+  block_groups("PA", "Philadelphia", cb = TRUE, class = 'sf') %>%
+  st_transform(3702)
+
+jan <- 
+  leisure %>%
+  filter(month == 1) %>%
+  filter(cbg %in% tig$GEOID) %>%
+  select(-month) %>%
+  pivot_wider(names_from = cbg, values_from = visits) %>%
+  replace(is.na(.), 0) %>%
+  as.data.frame()
+
+rownames(jan) <- jan$safegraph_place_id
+jan <- jan[, -1]
+jan <- as.matrix(jan)
+
+## Block-to-Block
+t(jan) %*% jan
+
+## Venue-to-Venue
+jan %*% t(jan) 
+
+## Create graph
+net <- graph_from_adjacency_matrix(t(jan) %*% jan, mode = "undirected", diag = FALSE, weighted = TRUE)
+
+lay <- layout_with_fr(net)
+lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+
+png(file = "test.png", width = 900, height = 900)
+
+plot(
+  net,
+  layout = lay, 
+  vertex.size = degree(graph)/100,
+  vertex.label = NA,
+  edge.arrow.size = 0,
+)
+
+dev.off()
+
+apr <- 
+  leisure %>%
+  filter(month == 4) %>%
+  filter(cbg %in% tig$GEOID) %>%
+  select(-month) %>%
+  pivot_wider(names_from = cbg, values_from = visits) %>%
+  replace(is.na(.), 0) %>%
+  as.data.frame()
+
+rownames(apr) <- apr$safegraph_place_id
+apr <- apr[, -1]
+apr <- as.matrix(apr)
+
+## Block-to-Block
+t(apr) %*% apr
+
+## Venue-to-Venue
+apr %*% t(apr) 
+
+## Create graph
+net <- graph_from_adjacency_matrix(t(apr) %*% apr, mode = "undirected", diag = FALSE, weighted = TRUE)
+
+lay <- layout_with_fr(net)
+lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+
+png(file = "april.png", width = 900, height = 900)
+
+plot(
+  net,
+  layout = lay, 
+  vertex.size = degree(graph)/100,
+  vertex.label = NA,
+  edge.arrow.size = 0,
+)
+
+dev.off()
+
+##
+
+map(1:8, function(x){
+  
+  mon <- 
+    leisure %>%
+    filter(month == 1) %>%
+    filter(cbg %in% tig$GEOID) %>%
+    select(-month) %>%
+    pivot_wider(names_from = cbg, values_from = visits) %>%
+    replace(is.na(.), 0) %>%
+    as.data.frame()
+  
+  rownames(mon) <- mon$safegraph_place_id
+  mon <- mon[, -1]
+  mon <- as.matrix(mon)
+  
+  net <- graph_from_adjacency_matrix(t(mon) %*% mon, mode = "undirected", diag = FALSE, weighted = TRUE)
+  
+  lay <- layout_with_fr(net)
+  lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+  
+  png(file = glue("{x}.png"), width = 900, height = 900)
+  
+  plot(
+    main = "Philadelphia Integration",
+    sub = glue("{stamp[x]}"),
+    net,
+    layout = lay, 
+    vertex.size = degree(graph)/100,
+    vertex.label = NA,
+    vertex.color = '#0005d7',
+    edge.arrow.size = 0,
+  )
+  
+  dev.off()
+  
+})
+
+##
+
+list.files(path='miscellany/animations/trimmed', pattern = '*.png', full.names = TRUE) %>% 
+  image_read() %>% 
+  image_join() %>% 
+  image_animate(fps = 1) %>% 
+  image_write("trimmed.gif")
+
+pal
