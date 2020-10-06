@@ -27,7 +27,7 @@ stamp <- c("January", "February", "March", "April", "May", "June", "July", "Augu
 
 joint <- 
   odmat %>% 
-  filter(month == x) %>%
+  filter(month == 1) %>%
   left_join(sginf) %>%
   drop_na(naics)
 
@@ -209,7 +209,6 @@ map(1:8, function(x){
 ##
 
 library(magick)
-library(magrittr)
 
 ##
 
@@ -293,6 +292,18 @@ apr %*% t(apr)
 ## Create graph
 net <- graph_from_adjacency_matrix(t(apr) %*% apr, mode = "undirected", diag = FALSE, weighted = TRUE)
 
+net <- delete_edges(net, which(E(net)$weight < 100))
+net <- delete_vertices(net, which(degree(net) < 1))
+
+decom <- decompose(net, mode = c("weak"),
+                   min.vertices = 2)
+
+decom <- decom[[1]]
+
+decom <- 
+  decom %>% 
+  set_vertex_attr("community", value = cluster_louvain(decom)$membership) 
+
 lay <- layout_with_fr(net)
 lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
 
@@ -303,6 +314,8 @@ plot(
   layout = lay, 
   vertex.size = degree(graph)/100,
   vertex.label = NA,
+  vertex.color = V(decom)$community,
+  palette = pal,
   edge.arrow.size = 0,
 )
 
@@ -310,11 +323,21 @@ dev.off()
 
 ##
 
+tig %>% 
+  left_join(tibble(GEOID = V(decom)$name, 
+                   community = V(decom)$community)) %>%
+  mutate(community = factor(community)) %>%
+  tm_shape() + 
+  tm_fill(col = "community",
+          pal = pal[2:10])
+
+##
+
 map(1:8, function(x){
   
   mon <- 
     leisure %>%
-    filter(month == 1) %>%
+    filter(month == x) %>%
     filter(cbg %in% tig$GEOID) %>%
     select(-month) %>%
     pivot_wider(names_from = cbg, values_from = visits) %>%
@@ -327,7 +350,19 @@ map(1:8, function(x){
   
   net <- graph_from_adjacency_matrix(t(mon) %*% mon, mode = "undirected", diag = FALSE, weighted = TRUE)
   
-  lay <- layout_with_fr(net)
+  net <- delete_edges(net, which(E(net)$weight < 100))
+  net <- delete_vertices(net, which(degree(net) < 1))
+  
+  decom <- decompose(net, mode = c("weak"),
+                     min.vertices = 2)
+  
+  decom <- decom[[1]]
+  
+  decom <- 
+    decom %>% 
+    set_vertex_attr("community", value = cluster_louvain(decom)$membership) 
+  
+  lay <- layout_with_fr(decom)
   lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
   
   png(file = glue("{x}.png"), width = 900, height = 900)
@@ -335,11 +370,14 @@ map(1:8, function(x){
   plot(
     main = "Philadelphia Integration",
     sub = glue("{stamp[x]}"),
-    net,
+    decom,
     layout = lay, 
-    vertex.size = degree(graph)/100,
+    vertex.size = degree(decom)/100,
     vertex.label = NA,
-    vertex.color = '#0005d7',
+    vertex.color = V(decom)$community,
+    palette = pal,
+    vertex.frame.color = '#000000',
+    vertex.frame.width = 0.05,
     edge.arrow.size = 0,
   )
   
@@ -349,10 +387,8 @@ map(1:8, function(x){
 
 ##
 
-list.files(path='miscellany/animations/trimmed', pattern = '*.png', full.names = TRUE) %>% 
+list.files(path = 'miscellany/animations/integration', pattern = '*.png', full.names = TRUE) %>% 
   image_read() %>% 
   image_join() %>% 
   image_animate(fps = 1) %>% 
   image_write("trimmed.gif")
-
-pal

@@ -486,6 +486,8 @@ ggplot() +
   theme(legend.position = 'bottom') +
   ggsave("context.png", height = 6, width = 4, dpi = 300)
 
+##
+
 ggplot() +
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
@@ -520,6 +522,8 @@ cross <-
                      str_detect(top_category, "Religious") ~ "worship",
                      TRUE ~ "other"))
 
+##
+
 ready <- 
   fixed %>% 
   mutate(mon = month(date_range_start),
@@ -532,38 +536,42 @@ ready <-
   summarise(visits = sum(visits)) %>%
   rename(ds = date, y = visits)
 
+##
+
 proph <- prophet(ready, weekly.seasonality = TRUE, changepoint.prior.scale = 0.9, n.changepoints = 4)
+
+##
 
 blank <- make_future_dataframe(proph, periods = 365 - nrow(ready))  
 preds <- predict(proph, blank)
 
-ggplot() +
-  geom_line(data = preds,
-            aes(as_date(ds), yhat),  colour = pal[2], size = 1, alpha = 0.25) +
-  geom_line(data = preds,
-            aes(as_date(ds), trend), colour = pal[2], size = 2) +
-  geom_point(data = ready, 
-             aes(ds, y), colour = pal[4]) +
-  geom_vline(xintercept = as_date(proph$changepoints), linetype = 2, colour = pal[11], size = 1) +
-  labs(title = "Change Point Detection: leisure activities",
-       subtitle = "Fitting a Bayesian model to the data",
-       x = "", y = "visits") +
+## 
+
+odmat <- vroom("data/processed/od_monthly.csv")
+
+##
+
+moves %>%
+  mutate(month = month(date_range_start, label = TRUE)) %>%
+  select(safegraph_place_id, raw_visit_counts, month) %>%
+  left_join(phila) %>%
+  mutate(type = case_when(str_detect(top_category, "Restaurants|Drinking") ~ "leisure",
+                          str_detect(top_category, "Schools|Child") ~ "school",
+                          str_detect(top_category, "Stores") & str_detect(top_category, "Food|Grocery|Liquor") ~ "grocery",
+                          str_detect(top_category, "Stores|Dealers") & !str_detect(top_category, "Food|Grocery|Liquor") ~ "shopping",
+                          str_detect(top_category, "Gasoline Stations|Automotive") ~ "automotive",
+                          str_detect(top_category, "Real estate") ~ "real Estate",
+                          str_detect(top_category, "Museums|Amusement|Accommodation|Sports|Gambling") ~ "tourism", 
+                          str_detect(top_category, "Offices|Outpatient|Nursing|Home Health|Diagnostic") & !str_detect(top_category, "Real Estate") ~ "healthcare",
+                          str_detect(top_category, "Care") & str_detect(top_category, "Personal") ~ "pharmacy",
+                          str_detect(top_category, "Religious") ~ "worship",
+                          TRUE ~ "other")) %>%
+  group_by(type, month) %>%
+  summarise(visits = sum(raw_visit_counts)) %>%
+  ggplot(aes(x = month, y = visits, colour = type)) +
+  geom_path(aes(group = type), size = 1) +
+  scale_colour_manual(values = pal,
+                      name = "type of venue") +
+  xlab("") +
   theme_hor() +
-  ggsave("changepoints.png", height = 6, width = 10, dpi = 300)
-
-##
-
-library(rayshader)
-library(rayrender)
-library(scales)
-
-##
-
-joint %>%
-  filter(month == "Jul") %>%
-  raster::rasterize()
-  
-  
-
-##
-
+  ggsave("seriesxtype.png", height = 4, width = 8, dpi = 300)
