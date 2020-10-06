@@ -1,0 +1,221 @@
+########################################
+## Regraphing
+########################################
+
+source("R/package.R")
+source("R/help.R")
+
+##
+
+odmat <- vroom("data/processed/od_monthly.csv")
+
+phila <- read_sf("data/processed/phila.geojson")
+
+##
+
+sginf <- 
+  phila %>% 
+  transmute(safegraph_place_id = safegraph_place_id,
+            locale = location_name, type = top_category, naics = str_sub(naics_code, 1, 2)) %>% 
+  st_drop_geometry()
+
+##
+
+stamp <- c("January", "February", "March", "April", "May", "June", "July", "August") 
+
+##
+
+joint <- 
+  odmat %>% 
+  filter(month == x) %>%
+  left_join(sginf) %>%
+  drop_na(naics)
+
+##
+
+links <- transmute(joint,from = cbg, to = safegraph_place_id, weight = visits)
+
+##
+
+color <- 
+  joint %>%
+  mutate(class = case_when(str_detect(type, "Restaurants|Drinking") ~ "leisure",
+                           str_detect(type, "Schools|Child") ~ "school",
+                           str_detect(type, "Stores") & str_detect(type, "Food|Grocery|Liquor") ~ "grocery",
+                           str_detect(type, "Stores|Dealers") & !str_detect(type, "Food|Grocery|Liquor") ~ "shopping",
+                           str_detect(type, "Gasoline Stations|Automotive") ~ "automotive",
+                           str_detect(type, "Real Estate") ~ "real Estate",
+                           str_detect(type, "Museums|Amusement|Accommodation|Sports|Gambling") ~ "tourism", 
+                           str_detect(type, "Offices|Outpatient|Nursing|Home Health|Diagnostic") & !str_detect(type, "Real Estate") ~ "healthcare",
+                           str_detect(type, "Care") & str_detect(type, "Personal") ~ "pharmacy",
+                           str_detect(type, "Religious") ~ "worship",
+                           TRUE ~ "other")) %>%
+  group_by(class) %>% 
+  summarise(n = sum(visits)) %>%
+  arrange(desc(n)) %>% 
+  mutate(cmap = sample(pal))
+
+cross <- 
+  joint %>%
+  mutate(class = case_when(str_detect(type, "Restaurants|Drinking") ~ "leisure",
+                           str_detect(type, "Schools|Child") ~ "school",
+                           str_detect(type, "Stores") & str_detect(type, "Food|Grocery|Liquor") ~ "grocery",
+                           str_detect(type, "Stores|Dealers") & !str_detect(type, "Food|Grocery|Liquor") ~ "shopping",
+                           str_detect(type, "Gasoline Stations|Automotive") ~ "automotive",
+                           str_detect(type, "Real Estate") ~ "real Estate",
+                           str_detect(type, "Museums|Amusement|Accommodation|Sports|Gambling") ~ "tourism", 
+                           str_detect(type, "Offices|Outpatient|Nursing|Home Health|Diagnostic") & !str_detect(type, "Real Estate") ~ "healthcare",
+                           str_detect(type, "Care") & str_detect(type, "Personal") ~ "pharmacy",
+                           str_detect(type, "Religious") ~ "worship",
+                           TRUE ~ "other")) %>%
+  distinct(type, .keep_all = TRUE) %>%
+  select(type, class)
+
+##
+
+verts <- 
+  joint %>% 
+  distinct(safegraph_place_id, .keep_all = TRUE) %>%
+  select(-visits, -cbg) %>% 
+  left_join(cross) %>% 
+  left_join(color)
+
+##
+
+graph <- graph_from_data_frame(links, directed = TRUE)
+V(graph)$type <- bipartite_mapping(graph)$type
+
+comps <- components(graph, mode = "weak")
+
+graph <-
+  graph %>% 
+  set_vertex_attr("venue", index = V(graph)[type=="TRUE"], value = verts$locale)  %>% 
+  set_vertex_attr("description", index = V(graph)[type=="TRUE"], value = verts$class) %>%
+  set_vertex_attr("naics", index = V(graph)[type=="TRUE"], value = verts$naics) %>%
+  set_vertex_attr("cmap", index = V(graph)[type=="TRUE"], value = verts$cmap) %>%
+  set_vertex_attr("venue", index = V(graph)[type=="FALSE"], value = "")  %>% 
+  set_vertex_attr("description", index = V(graph)[type=="FALSE"], value = "") %>%
+  set_vertex_attr("naics", index = V(graph)[type=="FALSE"], value = "") %>%
+  set_vertex_attr("cmap", index = V(graph)[type=="FALSE"], value = '#000000') %>%
+  set_vertex_attr("comp", value = comps$membership)
+
+graph <- simplify(graph)
+
+decom <- decompose(graph, mode = c("weak"),
+                   min.vertices = 2)
+
+decom <- decom[[1]]
+
+##
+
+place <- joint %>% filter(locale == "Logan Square") %>% pull(safegraph_place_id) %>% magrittr::extract(1)
+place <- joint %>% filter(str_detect(locale, "Comcast") & !str_detect(locale, "XFINITY"))  %>% pull(safegraph_place_id) %>% magrittr::extract(1)
+
+ego <- make_ego_graph(decom, order = 2, nodes = V(decom)[name==place], mode = 'all')
+ego <- ego[[1]]
+
+lay <- layout_with_fr(ego)#, weights = E(decom)$weight)
+lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+
+png(file = "test.png", width = 900, height = 900)
+
+plot(
+  main = "Logan Square",
+  sub = "April",
+  ego,
+  layout = lay,
+  vertex.size = sqrt(degree(ego)),
+  vertex.label = NA, # V(ego)$venue,
+  vertex.label.color = '#000000',
+  edge.arrow.size = 0,
+  vertex.color = V(ego)$cmap
+)
+
+dev.off()
+
+##
+
+map(1:8, function(x){
+  joint <- 
+    odmat %>% 
+    filter(month == x) %>%
+    left_join(sginf) %>%
+    drop_na(naics)
+  
+  links <- transmute(joint,from = cbg, to = safegraph_place_id, weight = visits)
+  
+  verts <- 
+    joint %>% 
+    distinct(safegraph_place_id, .keep_all = TRUE) %>%
+    select(-visits, -cbg) %>% 
+    left_join(cross) %>% 
+    left_join(color)
+  
+  
+  graph <- graph_from_data_frame(links, directed = TRUE)
+  V(graph)$type <- bipartite_mapping(graph)$type
+  
+  comps <- components(graph, mode = "weak")
+  
+  graph <-
+    graph %>% 
+    set_vertex_attr("venue", index = V(graph)[type=="TRUE"], value = verts$locale)  %>% 
+    set_vertex_attr("description", index = V(graph)[type=="TRUE"], value = verts$class) %>%
+    set_vertex_attr("naics", index = V(graph)[type=="TRUE"], value = verts$naics) %>%
+    set_vertex_attr("cmap", index = V(graph)[type=="TRUE"], value = verts$cmap) %>%
+    set_vertex_attr("venue", index = V(graph)[type=="FALSE"], value = "")  %>% 
+    set_vertex_attr("description", index = V(graph)[type=="FALSE"], value = "") %>%
+    set_vertex_attr("naics", index = V(graph)[type=="FALSE"], value = "") %>%
+    set_vertex_attr("cmap", index = V(graph)[type=="FALSE"], value = '#000000') %>%
+    set_vertex_attr("comp", value = comps$membership)
+  
+  graph <- simplify(graph)
+  
+  decom <- decompose(graph, mode = c("weak"),
+                     min.vertices = 2)
+  
+  decom <- decom[[1]]
+  
+  place <- 
+    joint %>% 
+    filter(str_detect(locale, "Fairmount Park")) %>% 
+    pull(safegraph_place_id) %>% 
+    magrittr::extract() %>%
+    unique()
+  
+  ego <- make_ego_graph(decom, order = 2, nodes = V(decom)[name %in% place], mode = 'all')
+  ego <- ego[[1]]
+  
+  lay <- layout_with_fr(ego)#, weights = E(decom)$weight)
+  lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+  
+  png(file = glue("{x}.png"), width = 900, height = 900)
+  
+  plot(
+    main = "Fairmount Park",
+    sub = glue("{stamp[x]}"),
+    ego,
+    layout = lay,
+    vertex.size = sqrt(degree(ego)),
+    vertex.label = NA, # V(ego)$venue,
+    vertex.label.color = '#000000',
+    edge.arrow.size = 0,
+    vertex.color = V(ego)$cmap
+  )
+  
+  dev.off()
+})
+
+##
+
+library(magick)
+library(magrittr)
+
+##
+
+list.files(path='animations/fairmount', pattern = '*.png', full.names = TRUE) %>% 
+  image_read() %>% 
+  image_join() %>% 
+  image_animate(fps = 1) %>% 
+  image_write("fairmount.gif")
+
