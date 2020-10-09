@@ -7,7 +7,16 @@ maps and tables. Note that SafeGraph captures a slice of the population,
 attempting to monitor a representative sample of the population across
 the country; that said, we can reduce noise through various aggregations
 and by tracking trends, which are naturally indexed to population of
-devices rather than the population as a whole.
+devices rather than the population as a whole. We definitions specified
+in the following infographic: the number of visitors is the count of
+devices flowing to a point of interest—be it from a given Census Block
+Group or total—while a connection is an origin-destination line between
+a Census Block Group and a point of interest, regardless of its weight.
+We use both here to determine how many people are moving about the city
+and from where to where, which calls to how integrated the city is
+during the pandemic.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
 
 Points of Interest
 ------------------
@@ -57,7 +66,7 @@ important community amenity; all saw fewer visits in April and May than
 later in the summer, suggesting winter patterns even as the weather
 improved.
 
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/parks.png)
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
 
 Aggregations
 ------------
@@ -101,9 +110,17 @@ pockets of thriving activity in these maps.
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
 We can also aggregate by use, grouping by classes like leisure and
-tourisms. Below we define leisure as visits to restaurants and bars, and
-see that there are distinct changes in the flow between March and April
-using a technique called change point detect.
+tourism. The pandemic had distinct effects on each class, but
+particularly leisure—like restaurants and bars—and other; other includes
+offices which also explains the steep fall. Interestingly, tourism is
+recovery while shops and grocers are not, perhaps as many switch to
+digital commerce.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
+
+Below we define leisure as visits to restaurants and bars, and see that
+there are distinct changes in the flow between March and April using a
+technique called change point detection.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changepoints.png)
 

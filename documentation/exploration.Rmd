@@ -11,7 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Exploration
 
-With the goal of understanding the time-space patterns of resident movement in Philadelphia, the following section presents a series of maps and tables. Note that SafeGraph captures a slice of the population, attempting to monitor a representative sample of the population across the country; that said, we can reduce noise through various aggregations and by tracking trends, which are naturally indexed to population of devices rather than the population as a whole. 
+With the goal of understanding the time-space patterns of resident movement in Philadelphia, the following section presents a series of maps and tables. Note that SafeGraph captures a slice of the population, attempting to monitor a representative sample of the population across the country; that said, we can reduce noise through various aggregations and by tracking trends, which are naturally indexed to population of devices rather than the population as a whole. We definitions specified in the following infographic: the number of visitors is the count of devices flowing to a point of interest—be it from a given Census Block Group or total—while a connection is an origin-destination line between a Census Block Group and a point of interest, regardless of its weight. We use both here to determine how many people are moving about the city and from where to where, which calls to how integrated the city is during the pandemic. 
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
+
 
 ## Points of Interest
 
@@ -31,7 +34,7 @@ The airport fell in the ranks, though all others saw few visitors in August than
 
 Yet with offices vacant, parks should have swelled with visitors. We see mixed evidence of this in the data. Philadelphia has four central squares—Rittenhouse, Washington, Logan, and Franklin—which provide important community amenity; all saw fewer visits in April and May than later in the summer, suggesting winter patterns even as the weather improved.    
 
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/parks.png)
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
 
 ## Aggregations
 
@@ -45,7 +48,11 @@ Using regular tesselations, we can aggregate to a grid of 500 meter cells to see
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
-We can also aggregate by use, grouping by classes like leisure and tourisms. Below we define leisure as visits to restaurants and bars, and see that there are distinct changes in the flow between March and April using a technique called change point detect. 
+We can also aggregate by use, grouping by classes like leisure and tourism. The pandemic had distinct effects on each class, but particularly leisure—like restaurants and bars—and other; other includes offices which also explains the steep fall. Interestingly, tourism is recovery while shops and grocers are not, perhaps as many switch to digital commerce.   
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
+
+Below we define leisure as visits to restaurants and bars, and see that there are distinct changes in the flow between March and April using a technique called change point detection. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changepoints.png)
 
