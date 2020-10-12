@@ -124,6 +124,25 @@ technique called change point detection.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changepoints.png)
 
+From here, we can fit a similar model to each neighborhood based on the
+food traffic to that region. We do this by aggregating visits to every
+point of interest within a given boundary. This means that we are
+measuring visits to points of interest, not general activity on the
+streets and in the residences of a neighborhood. Rather than simply flag
+the change points across time and space, we can instead pull from the
+model the rate change at regular intervals throughout the period; these
+changes, rates being the rates of visits, then show the volatility of
+mobility patterns across time.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/volatility.png)
+
+We can see that there is a period of abrupt change in April and May,
+coinciding with the pandemic but starting later and ending earlier in
+different neighborhoods. The appendix has a chart that logs each
+significant change point (above 10 percent change in the trend
+week-on-week) for each neighborhood, and maps the volatility associated
+with them for additional clarity.
+
 Appendix:
 ---------
 
