@@ -134,7 +134,7 @@ model the rate change at regular intervals throughout the period; these
 changes, rates being the rates of visits, then show the volatility of
 mobility patterns across time.
 
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/volatility.png)
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/tracker.gif)
 
 We can see that there is a period of abrupt change in April and May,
 coinciding with the pandemic but starting later and ending earlier in
@@ -160,6 +160,8 @@ Appendix:
 </tr>
 </tbody>
 </table>
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/volatility.png)
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changexhoods.png)
 
