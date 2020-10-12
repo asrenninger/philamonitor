@@ -141,3 +141,7 @@ Appendix:
 </tr>
 </tbody>
 </table>
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changexhoods.png)
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changexmagnitude.png)
