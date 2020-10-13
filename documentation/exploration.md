@@ -126,7 +126,10 @@ digital commerce.
 
 Below we define leisure as visits to restaurants and bars, and see that
 there are distinct changes in the flow between March and April using a
-technique called change point detection.
+technique called change point detection. The model does not seem to
+settle on change points in situations with little change; grocers saw
+much less change than restaurants and the change points are far less
+clear, appearing in pairs at each hinge.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changepoints.png)
 
