@@ -28,6 +28,10 @@ We can start by looking at which points of interest were most popular in the beg
 :-------------------------:|:-------------------------:
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png) 
 
+We can also show how visitation is change across time by tracking footfall across brands. Notice in this animation that dollar stores rise gradually throughout the year. 
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
+
 The airport fell in the ranks, though all others saw few visitors in August than in January—even more striking when we consider weather, which could have produced the opposite effect in other years. Malls and shopping centers appear to have weathered the pandemic well, but the shift to remote work should also appear in the data. We can look at visits to the Comcast Center and the Plaza below it; visits in April and May, as the coronavirus took hold in the city, fell to the point of irrelevance. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/comcast.png)
@@ -43,10 +47,6 @@ Perhaps more valuable than probing individual points of interest is aggregating 
 Best             |  Worst
 :-------------------------:|:-------------------------:
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png)| ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png)
-
-We can also show how visitation is change across time by tracking footfall across brands. Notice in this animation that dollar stores rise gradually throughout the year. 
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
 
 Using regular tesselations, we can aggregate to a grid of 500 meter cells to see how this manifests across space. We are still aggregating from points of interest, so this is visits to businesses, parks, museums and the like, but by tile; this does not include visits to the particular patch of land without setting foot in a point of interest. The city hollowed out during the worst months of the pandemic but the Old City, Center City, University City axis still appears to have pockets of thriving activity in these maps.   
 
