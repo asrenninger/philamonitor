@@ -98,6 +98,12 @@ tables.)
 </tbody>
 </table>
 
+We can also show how visitation is change across time by tracking
+footfall across brands. Notice in this animation that dollar stores rise
+gradually throughout the year.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
+
 Using regular tesselations, we can aggregate to a grid of 500 meter
 cells to see how this manifests across space. We are still aggregating
 from points of interest, so this is visits to businesses, parks, museums
