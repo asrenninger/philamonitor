@@ -33,7 +33,7 @@ joint <-
 
 ##
 
-links <- transmute(joint,from = cbg, to = safegraph_place_id, weight = visits)
+links <- transmute(joint, from = cbg, to = safegraph_place_id, weight = visits)
 
 ##
 
@@ -204,6 +204,7 @@ map(1:8, function(x){
   )
   
   dev.off()
+  
 })
 
 ##
@@ -254,6 +255,7 @@ jan %*% t(jan)
 
 ## Create graph
 net <- graph_from_adjacency_matrix(t(jan) %*% jan, mode = "undirected", diag = FALSE, weighted = TRUE)
+diameter(net)
 
 lay <- layout_with_fr(net)
 lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
@@ -287,10 +289,12 @@ apr <- as.matrix(apr)
 t(apr) %*% apr
 
 ## Venue-to-Venue
-apr %*% t(apr) 
+apr %*% t(apr)
 
 ## Create graph
 net <- graph_from_adjacency_matrix(t(apr) %*% apr, mode = "undirected", diag = FALSE, weighted = TRUE)
+diameter(net)
+
 
 net <- delete_edges(net, which(E(net)$weight < 100))
 net <- delete_vertices(net, which(degree(net) < 1))
@@ -329,7 +333,8 @@ tig %>%
   mutate(community = factor(community)) %>%
   tm_shape() + 
   tm_fill(col = "community",
-          pal = pal[2:10])
+          pal = pal[2:10]) +
+  tm_layout(frame.lwd = 0)
 
 ##
 
@@ -368,7 +373,7 @@ map(1:8, function(x){
   png(file = glue("{x}.png"), width = 900, height = 900)
   
   plot(
-    main = "Philadelphia Integration",
+    main = "Philadelphia Patterns: shared venues between neighborhoods",
     sub = glue("{stamp[x]}"),
     decom,
     layout = lay, 
@@ -387,8 +392,107 @@ map(1:8, function(x){
 
 ##
 
-list.files(path = 'miscellany/animations/integration', pattern = '*.png', full.names = TRUE) %>% 
+list.files(path = 'miscellany/networks/mode_one', pattern = '*.png', full.names = TRUE) %>% 
   image_read() %>% 
   image_join() %>% 
   image_animate(fps = 1) %>% 
-  image_write("trimmed.gif")
+  image_write("mode_one.gif")
+
+##
+
+map(1:8, function(x){
+  
+  mon <- 
+    leisure %>%
+    filter(month == x) %>%
+    filter(cbg %in% tig$GEOID) %>%
+    select(-month) %>%
+    pivot_wider(names_from = cbg, values_from = visits) %>%
+    replace(is.na(.), 0) %>%
+    as.data.frame()
+  
+  rownames(mon) <- mon$safegraph_place_id
+  mon <- mon[, -1]
+  mon <- as.matrix(mon)
+  
+  net <- graph_from_adjacency_matrix(t(mon) %*% mon, mode = "undirected", diag = FALSE, weighted = TRUE)
+  
+  net <- delete_edges(net, which(E(net)$weight < 100))
+  net <- delete_vertices(net, which(degree(net) < 1))
+  
+  decom <- decompose(net, mode = c("weak"),
+                     min.vertices = 2)
+  
+  decom <- decom[[1]]
+  
+  decom <- 
+    decom %>% 
+    set_vertex_attr("community", value = cluster_louvain(decom)$membership) 
+  
+  lay <- layout_with_fr(decom)
+  lay <- norm_coords(lay, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+  
+  png(file = glue("miscellany/animations/working/net_{x}.png"), width = 900, height = 900)
+  
+  plot(
+    main = "Philadelphia Integration",
+    sub = glue("{stamp[x]}"),
+    decom,
+    layout = lay, 
+    vertex.size = degree(decom)/100,
+    vertex.label = NA,
+    vertex.color = V(decom)$community,
+    palette = pal,
+    vertex.frame.color = '#000000',
+    vertex.frame.width = 0.05,
+    edge.arrow.size = 0,
+  )
+  
+  dev.off()
+  
+  map <- 
+    tig %>% 
+    left_join(tibble(GEOID = V(decom)$name, 
+                     community = V(decom)$community)) %>%
+    mutate(community = factor(community)) %>%
+    tm_shape() + 
+    tm_fill(col = "community",
+            pal = pal[2:10]) +
+    tm_layout(frame.lwd = 0,
+              legend.show=FALSE)
+  
+  tmap_save(map, glue("miscellany/animations/working/map_{x}.png"), width = 600, height = 900, unit = 'px')
+  
+  list.files(path = 'miscellany/animations/working', pattern = glue("*{x}.png"), full.names = TRUE) %>% 
+    image_read() %>% 
+    image_join() %>% 
+    image_append() %>% 
+    image_write(glue("{x}.png"))
+  
+})
+
+list.files(path = 'miscellany/animations/combined', pattern = "*.png", full.names = TRUE) %>% 
+  image_read() %>% 
+  image_join() %>% 
+  image_animate(fps = 1) %>% 
+  image_write(glue("combined.gif"))
+
+show_col(pal)
+
+##
+
+ggplot(data = color) +
+  geom_tile(aes(x = class, y = 1, fill = cmap)) +
+  geom_text(aes(x = class, y = 1, label = tolower(class))) +
+  geom_text(data = 
+              color %>% 
+              filter(class == "worship"),
+            aes(x = class, y = 1, label = tolower(class)), colour = '#ffffff') +  
+  scale_fill_identity() +
+  coord_equal() +
+  theme_void() +
+  ggsave("cmap.png")
+
+##
+
+diameter(net)

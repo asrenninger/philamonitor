@@ -121,12 +121,12 @@ top10 <-
   test %>%
   select(neighborhood, visits) %>%
   group_by(neighborhood) %>%
-  mutate(best = max(visits),
-         worst = min(visits),
-         last = last(visits)) %>%
+  mutate(highest = max(visits),
+         lowest = min(visits),
+         recent = last(visits)) %>%
   select(-visits) %>%
   mutate_if(is.numeric, round) %>%
-  mutate(change = (last - best) / best) %>%
+  mutate(change = (recent - highest) / highest) %>%
   slice(1) %>%
   ungroup() %>%
   left_join(plots) %>%
@@ -135,18 +135,18 @@ top10 <-
   slice(1:20)
 
 top10_plots <- select(top10, neighborhood, plot)
-top10 <- select(top10, neighborhood, best, worst, last, change)
+top10 <- select(top10, neighborhood, highest, lowest, recent, change)
  
 bot10 <- 
   test %>%
   select(neighborhood, visits) %>%
   group_by(neighborhood) %>%
-  mutate(best = max(visits),
-         worst = min(visits),
-         last = last(visits)) %>%
+  mutate(highest = max(visits),
+         lowest = min(visits),
+         recent = last(visits)) %>%
   select(-visits) %>%
   mutate_if(is.numeric, round) %>%
-  mutate(change = (last - best) / best) %>%
+  mutate(change = (recent - highest) / highest) %>%
   slice(1) %>%
   ungroup() %>%
   left_join(plots) %>%
@@ -154,7 +154,7 @@ bot10 <-
   slice(1:20)
 
 bot10_plots <- select(bot10, neighborhood, plot)
-bot10 <- select(bot10, neighborhood, best, worst, last, change)
+bot10 <- select(bot10, neighborhood, highest, lowest, recent, change)
 
 ##
 
@@ -166,8 +166,8 @@ bot10 %>%
   mutate(ggplot = NA) %>% 
   gt() %>% 
   tab_header(title = html("<b>Neighborhood Visitors: bottom twenty</b>"),
-             subtitle = md("Change in footfall in select neighborhoods in Philadelphia<br><br>")) %>%
-  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Decline is the percent fall from best to last"))  %>% 
+             subtitle = md("Highest, lowest, and most recent footfall in Philadelphia<br><br>")) %>%
+  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
             locations = cells_column_labels(vars(`neighborhood`))) %>% 
   data_color(columns = vars(`change`),
@@ -192,8 +192,8 @@ top10 %>%
   mutate(ggplot = NA) %>% 
   gt() %>% 
   tab_header(title = html("<b>Neighborhood Visitors: top twenty</b>"),
-             subtitle = md("Change in footfall in select neighborhoods in Philadelphia<br><br>")) %>%
-  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Decline is the percent fall from best to last")) %>% 
+             subtitle = md("Highest, lowest, and most recent footfall in Philadelphiabr><br>")) %>%
+  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent")) %>% 
   tab_style(style = list(cell_text(weight = "bold")),
             locations = cells_column_labels(vars(`neighborhood`))) %>% 
   data_color(columns = vars(`change`),
@@ -338,34 +338,46 @@ map_df(1:8, function(x){
 odmat <- vroom("data/processed/od_monthly.csv")
 
 change <- 
-  bind_rows(
-    odmat %>%
-      filter(cbg %in% shape$GEOID) %>%
-      filter(month == 1) %>%
-      group_by(safegraph_place_id) %>%
-      summarise(connections = n()) %>%
-      left_join(phila) %>%
-      select(location_name, connections) %>%
-      arrange(desc(connections)) %>%
-      slice(1:10) %>%
-      mutate(period = "before (January)"),
-    odmat %>%
-      filter(cbg %in% shape$GEOID) %>%
-      filter(month == 8) %>%
-      group_by(safegraph_place_id) %>%
-      summarise(connections = n()) %>%
-      left_join(phila) %>%
-      select(location_name, connections) %>%
-      arrange(desc(connections)) %>%
-      slice(1:10) %>%
-      mutate(period = "after (August)"))
+  left_join(odmat %>%
+              filter(cbg %in% shape$GEOID) %>%
+              filter(month == 1) %>%
+              left_join(phila) %>%
+              mutate(location_name = case_when(str_detect(location_name, "Lincoln Technical Institute") ~ "University of Pennsylvania",
+                                               TRUE ~ location_name)) %>%
+              group_by(location_name) %>%
+              summarise(january = n()) %>%
+              select(location_name, january),
+            odmat %>%
+              filter(cbg %in% shape$GEOID) %>%
+              filter(month == 8) %>%
+              left_join(phila) %>%
+              mutate(location_name = case_when(str_detect(location_name, "Lincoln Technical Institute") ~ "University of Pennsylvania",
+                                               TRUE ~ location_name)) %>%
+              group_by(location_name) %>%
+              summarise(august = n()) %>%
+              select(location_name, august)) %>%
+  drop_na(august) %>%
+  filter(january > 1000) %>%
+  mutate(change = (august - january) / january)
 
-gt(data = change, rowname_col = "location_name", groupname_col = "period") %>%
+change <-
+  bind_rows(change %>%
+              arrange(desc(change)) %>%
+              slice(1:10) %>%
+              mutate(rank = "best"),
+            change %>%
+              arrange(change) %>%
+              slice(1:10) %>%
+              mutate(rank = "worst")) %>%
+  select(-august, -january) %>%
+  rename(`change (january-august)` = change)
+
+gt(data = change, rowname_col = "location_name", groupname_col = "rank") %>%
   tab_header(title = html("<b>Points of Interest: best and worst</b>"),
-             subtitle = md("Change in unique visitor origin neighborhoods<br><br>")) %>%
+             subtitle = md("Number of unique visitor origin neighborhoods<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: This is a count of unique desire lines, not total visitors"))  %>% 
   data_color(
-    columns = vars(`connections`),
+    columns = vars(`change (january-august)`),
     colors = scales::col_numeric(
       palette = rev(pal)[2:10],
       domain = NULL
@@ -416,31 +428,93 @@ ggplot() +
 
 comcast <- 
   phila %>% 
-  filter(str_detect(location_name, "Comcast") & !str_detect(location_name, "XFINITY")) 
+  filter(str_detect(location_name, "Comcast") & !str_detect(location_name, "XFINITY")) %>%
+  rename(geocode1 = GEOID)
 
 datum <- 
   odmat %>%
   mutate(month = month(start, label = TRUE)) %>% 
   filter(safegraph_place_id %in% comcast$safegraph_place_id) %>% 
-  left_join(parks) %>% 
-  select(location_name, safegraph_place_id, cbg, visits, month) %>%
+  left_join(comcast) %>% 
+  select(location_name, safegraph_place_id, cbg, visits, month, geocode1) %>%
   rename(GEOID = cbg) %>% 
   left_join(shape) %>%
   drop_na(ALAND, AWATER) %>% 
   st_as_sf()
 
+datum <- 
+  datum %>% 
+  transmute(geocode1 = geocode1,
+            geocode2 = GEOID,
+            visits = visits,
+            month = month) %>%
+  st_drop_geometry()
+
+glimpse(datum)
+glimpse(shape)
+
+lines <- stplanr::od2line(flow = datum, zones = transmute(shape, geocode = GEOID))
+
+##
+
 ggplot() +
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
-  geom_sf(data = datum, aes(fill = visits), colour = NA, lwd = 0) +
-  scale_fill_gradientn(colors = pal[2:10],
+  geom_sf(data = lines, aes(colour = visits, lwd = visits)) +
+  scale_colour_gradientn(colors = pal[2:10],
                        name = "visits",
                        guide = guide_continuous) +
+  scale_size_continuous(range = c(0.1, 1), guide = 'none') +
   facet_wrap(~ month, nrow = 1) +
   labs(title = 'Visitors to the Comcast Center', subtitle = "Devices by neighborhood of origin") +
   theme_map() +
   theme(legend.position = 'bottom') +
   ggsave("comcast.png", height = 4, width = 14, dpi = 300)
+
+reading <- 
+  phila %>% 
+  filter(str_detect(location_name, "Iovine|Field House|Hard Rock Cafe")) %>%
+  rename(geocode1 = GEOID)
+
+datum <- 
+  odmat %>%
+  mutate(month = month(start, label = TRUE)) %>% 
+  filter(safegraph_place_id %in% reading$safegraph_place_id) %>% 
+  left_join(reading) %>% 
+  select(location_name, safegraph_place_id, cbg, visits, month, geocode1) %>%
+  rename(GEOID = cbg) %>% 
+  left_join(shape) %>%
+  drop_na(ALAND, AWATER) %>% 
+  st_as_sf()
+
+datum <- 
+  datum %>% 
+  transmute(geocode1 = geocode1,
+            geocode2 = GEOID,
+            visits = visits,
+            month = month) %>%
+  st_drop_geometry()
+
+glimpse(datum)
+glimpse(shape)
+
+lines <- stplanr::od2line(flow = datum, zones = transmute(shape, geocode = GEOID))
+
+##
+
+ggplot() +
+  geom_sf(data = background, 
+          aes(), fill = NA, colour = '#000000', lwd = 0.5) +
+  geom_sf(data = lines, aes(colour = visits, lwd = visits)) +
+  scale_colour_gradientn(colors = pal[2:10],
+                         name = "visits",
+                         guide = guide_continuous) +
+  scale_size_continuous(range = c(0.1, 1), guide = 'none') +
+  facet_wrap(~ month, nrow = 1) +
+  labs(title = 'Visitors to Reading Terminal', subtitle = "Devices by neighborhood of origin") +
+  theme_map() +
+  theme(legend.position = 'bottom') +
+  ggsave("market.png", height = 4, width = 14, dpi = 300)
 
 ##
 
@@ -488,19 +562,40 @@ ggplot() +
 
 ##
 
+datum <-
+  phila %>%
+  st_coordinates() %>%
+  as_tibble() %>%
+  bind_cols(phila) %>% 
+  mutate(type = case_when(str_detect(top_category, "Restaurants|Drinking") ~ "leisure",
+                          str_detect(top_category, "Schools|Child") ~ "school",
+                          str_detect(top_category, "Stores") & str_detect(top_category, "Food|Grocery|Liquor") ~ "grocery",
+                          str_detect(top_category, "Stores|Dealers") & !str_detect(top_category, "Food|Grocery|Liquor") ~ "shopping",
+                          str_detect(top_category, "Gasoline Stations|Automotive") ~ "automotive",
+                          str_detect(top_category, "Real estate") ~ "real Estate",
+                          str_detect(top_category, "Museums|Amusement|Accommodation|Sports|Gambling") ~ "tourism", 
+                          str_detect(top_category, "Offices|Outpatient|Nursing|Home Health|Diagnostic") & !str_detect(top_category, "Real Estate") ~ "healthcare",
+                          str_detect(top_category, "Care") & str_detect(top_category, "Personal") ~ "pharmacy",
+                          str_detect(top_category, "Religious") ~ "worship",
+                          TRUE ~ "other")) %>%
+  select(-geometry) 
+
 ggplot() +
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
-  geom_point(data = datum %>%
-               filter(type != "other" & type != "automotive"), aes(x = X, y = Y, colour = type, size = visits), alpha = 0.5) +
-  scale_color_manual(values = sample(pal),
-                    guide = 'none') +
+  geom_hex(data = datum %>%
+             filter(type != "other" & type != "automotive"), aes(x = X, y = Y), alpha = 0.5) +
+  scale_fill_gradientn(colours = pal[2:10],
+                       guide = guide_continuous, 
+                       limits = c(0, 50),
+                       breaks = c(0, 10, 20, 30, 40, 50),
+                       labels = c("0", "10", "20", "30", "40", "50+"),
+                       oob = squish) +
   scale_size_continuous(range = c(0, 6), guide = 'none') +
   facet_wrap(~ type, nrow = 2) + 
-  labs(title = "Points of Interest", subtitle = "Venues by use category") +
+  labs(title = "Points of Interest", subtitle = "Venues density use category") +
   theme_map() +
-  theme(legend.position = 'bottom',
-        legend.text = element_text(angle = 45)) +
+  theme(legend.position = 'bottom') +
   ggsave("split.png", height = 6, width = 8, dpi = 300)
 
 ##
@@ -521,29 +616,6 @@ cross <-
                      str_detect(top_category, "Care") & str_detect(top_category, "Personal") ~ "pharmacy",
                      str_detect(top_category, "Religious") ~ "worship",
                      TRUE ~ "other"))
-
-##
-
-ready <- 
-  fixed %>% 
-  mutate(mon = month(date_range_start),
-         date = as_date(glue("2020-{mon}-{day}"))) %>%
-  select(safegraph_place_id, date, visits) %>%
-  mutate(visits = as.numeric(visits)) %>%
-  left_join(cross) %>%
-  filter(type == "leisure") %>%
-  group_by(date) %>%
-  summarise(visits = sum(visits)) %>%
-  rename(ds = date, y = visits)
-
-##
-
-proph <- prophet(ready, weekly.seasonality = TRUE, changepoint.prior.scale = 0.9, n.changepoints = 4)
-
-##
-
-blank <- make_future_dataframe(proph, periods = 365 - nrow(ready))  
-preds <- predict(proph, blank)
 
 ## 
 
@@ -572,6 +644,115 @@ moves %>%
   geom_path(aes(group = type), size = 1) +
   scale_colour_manual(values = pal,
                       name = "type of venue") +
+  labs(title = "Tracking Activity", subtitle = "Venues by category") +
   xlab("") +
   theme_hor() +
   ggsave("seriesxtype.png", height = 4, width = 8, dpi = 300)
+
+##
+
+ready <- 
+  fixed %>% 
+  mutate(mon = month(date_range_start),
+         date = as_date(glue("2020-{mon}-{day}"))) %>%
+  select(safegraph_place_id, date, visits) %>%
+  mutate(visits = as.numeric(visits)) %>%
+  left_join(cross) %>%
+  filter(type == "leisure") %>%
+  group_by(date) %>%
+  summarise(visits = sum(visits)) %>%
+  rename(ds = date, y = visits)
+
+##
+
+proph <- prophet(ready, weekly.seasonality = TRUE, changepoint.prior.scale = 0.9, n.changepoints = 4)
+
+##
+
+blank <- make_future_dataframe(proph, periods = 365 - nrow(ready))  
+preds <- predict(proph, blank)
+
+##
+
+proph$changepoints
+
+ggplot() +
+  geom_point(aes(x = proph$history$ds, y = proph$history$y),
+             colour = pal[4], size = 0.5) +
+  geom_line(data = preds, 
+            aes(x = ds, y = yhat), colour = pal[2], size = 0.5, alpha = 0.25) +
+  geom_line(data = preds, 
+            aes(x = ds, y = trend), colour = pal[2], size = 1) +
+  geom_vline(xintercept = proph$changepoints, linetype = 2, size = 0.5, colour = pal[11]) +
+  geom_text(aes(x = proph$changepoints - 24 * 60 * 60, y = 61000, label = glue("{month(proph$changepoints, label = TRUE)} {day(proph$changepoints)}")), 
+            hjust = 1, colour = pal[11], fontface = 'bold', size = 2) +
+  labs(title = "Change Points in Night Life", subtitle = "Fitting a model then predicting") +
+  xlab("") +
+  ylab("visits") +
+  theme_hor() +
+  ggsave("changepoints.png", height = 4, width = 6, dpi = 300)
+
+## 
+
+cross <- 
+  phila %>%
+  st_join(grid) %>% 
+  transmute(safegraph_place_id = safegraph_place_id,
+            id = id) %>% 
+  st_drop_geometry()
+
+##
+
+joint <- 
+  moves %>%
+  mutate(visits_by_day = str_remove_all(visits_by_day, pattern = "\\[|\\]"))  %>%
+  separate_rows(visits_by_day, sep = ",") %>%
+  mutate(month = month(date_range_start)) %>%
+  group_by(safegraph_place_id, month) %>%
+  mutate(day = 1:n()) %>%
+  ungroup() %>%
+  mutate(date = glue("2020-{month}-{day}")) %>%
+  select(safegraph_place_id, date, visits_by_day) %>%
+  mutate(visits_by_day = as.numeric(visits_by_day)) %>%
+  left_join(cross) %>%
+  group_by(date, neighborhood) %>%
+  summarise(visits = sum(visits_by_day)) %>%
+  ungroup() %>%
+  rename(ds = date, 
+         y = visits) 
+
+##
+
+nested <-
+  joint %>% 
+  group_by(neighborhood) %>% 
+  nest() %>%
+  ungroup()
+
+points <- function(df) {
+  
+  proph <- prophet(df, weekly.seasonality = TRUE)
+  proph$changepoints[abs(proph$params$delta) >= 0.01]
+  
+}
+
+modelled <- 
+  nested %>% 
+  mutate(points = map(data, points))
+
+modelled %>% 
+  filter(neighborhood != "NA") %>%
+  unnest(cols = points) %>% 
+  ggplot() +
+  geom_point(aes(x = reorder(neighborhood, as_date(points)), as_date(points)),
+             colour = pal[2]) +
+  xlab("") +
+  ylab("") +
+  coord_flip() +
+  labs(title = "Change Points Across Philadelphia", subtitle = "Testing different neighborhoods") +
+  theme_rot() +
+  theme(axis.text = element_text(size = 5)) +
+  ggsave("changexhoods.png", height = 12, width = 6, dpi = 300)
+
+
+

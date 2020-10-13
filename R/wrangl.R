@@ -186,7 +186,8 @@ top <-
   slice(1:4) %>%
   pull(LOCALE)
  
-map <- tm_shape(mat %>%
+map <- 
+  tm_shape(mat %>%
            filter(LOCALE == "421019807001")) +
   tm_fill(col = 'visits') +
   tm_shape(cbg %>%
