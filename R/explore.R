@@ -106,6 +106,7 @@ spark <- function(df){
     theme_void()
     
   return(sparkline)
+  
 }  
 
 ##
@@ -132,7 +133,7 @@ top10 <-
   left_join(plots) %>%
   arrange(desc(change)) %>%
   drop_na(neighborhood) %>%
-  slice(1:20)
+  slice(1:10)
 
 top10_plots <- select(top10, neighborhood, plot)
 top10 <- select(top10, neighborhood, highest, lowest, recent, change)
@@ -151,7 +152,7 @@ bot10 <-
   ungroup() %>%
   left_join(plots) %>%
   arrange(change) %>%
-  slice(1:20)
+  slice(1:10)
 
 bot10_plots <- select(bot10, neighborhood, plot)
 bot10 <- select(bot10, neighborhood, highest, lowest, recent, change)
@@ -165,7 +166,7 @@ library(gt)
 bot10 %>% 
   mutate(ggplot = NA) %>% 
   gt() %>% 
-  tab_header(title = html("<b>Neighborhood Visitors: bottom twenty</b>"),
+  tab_header(title = html("<b>Neighborhood Visitors: bottom ten</b>"),
              subtitle = md("Highest, lowest, and most recent footfall in Philadelphia<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
@@ -191,8 +192,8 @@ bot10 %>%
 top10 %>% 
   mutate(ggplot = NA) %>% 
   gt() %>% 
-  tab_header(title = html("<b>Neighborhood Visitors: top twenty</b>"),
-             subtitle = md("Highest, lowest, and most recent footfall in Philadelphiabr><br>")) %>%
+  tab_header(title = html("<b>Neighborhood Visitors: top ten</b>"),
+             subtitle = md("Highest, lowest, and most recent footfall in Philadelphia<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent")) %>% 
   tab_style(style = list(cell_text(weight = "bold")),
             locations = cells_column_labels(vars(`neighborhood`))) %>% 
@@ -651,6 +652,10 @@ moves %>%
 
 ##
 
+library(prophet)
+
+##
+
 ready <- 
   fixed %>% 
   mutate(mon = month(date_range_start),
@@ -665,32 +670,89 @@ ready <-
 
 ##
 
-proph <- prophet(ready, weekly.seasonality = TRUE, changepoint.prior.scale = 0.9, n.changepoints = 4)
+proph_1 <- prophet(ready, weekly.seasonality = TRUE, changepoint.prior.scale = 0.9, n.changepoints = 4)
+proph_1$changepoints <- proph_1$changepoints[abs(proph_1$params$delta) >= quantile(proph_1$params$delta,
+                                                                                   #c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+                                                                                   )[3]]
+
+?quantile
 
 ##
 
-blank <- make_future_dataframe(proph, periods = 365 - nrow(ready))  
-preds <- predict(proph, blank)
+blank_1 <- make_future_dataframe(proph_1, periods = 365 - nrow(ready))  
+preds_1 <- predict(proph_1, blank)
 
 ##
 
-proph$changepoints
-
-ggplot() +
-  geom_point(aes(x = proph$history$ds, y = proph$history$y),
+n <- 
+  ggplot() +
+  geom_point(aes(x = proph_1$history$ds, y = proph_1$history$y),
              colour = pal[4], size = 0.5) +
-  geom_line(data = preds, 
+  geom_line(data = preds_1, 
             aes(x = ds, y = yhat), colour = pal[2], size = 0.5, alpha = 0.25) +
-  geom_line(data = preds, 
+  geom_line(data = preds_1, 
             aes(x = ds, y = trend), colour = pal[2], size = 1) +
-  geom_vline(xintercept = proph$changepoints, linetype = 2, size = 0.5, colour = pal[11]) +
-  geom_text(aes(x = proph$changepoints - 24 * 60 * 60, y = 61000, label = glue("{month(proph$changepoints, label = TRUE)} {day(proph$changepoints)}")), 
+  geom_vline(xintercept = proph_1$changepoints, linetype = 2, size = 0.5, colour = pal[11]) +
+  geom_text(aes(x = proph_1$changepoints - 24 * 60 * 60, y = 61000, label = glue("{month(proph_1$changepoints, label = TRUE)} {day(proph_1$changepoints)}")), 
             hjust = 1, colour = pal[11], fontface = 'bold', size = 2) +
-  labs(title = "Change Points in Night Life", subtitle = "Fitting a model then predicting") +
+  #scale_y_continuous(limits = c(0, 62000), breaks = c(20000, 40000, 60000)) +
+  labs(subtitle = "Night life") + 
   xlab("") +
   ylab("visits") +
   theme_hor() +
-  ggsave("changepoints.png", height = 4, width = 6, dpi = 300)
+  theme(axis.text.x = element_blank())
+
+ready <- 
+  fixed %>% 
+  mutate(mon = month(date_range_start),
+         date = as_date(glue("2020-{mon}-{day}"))) %>%
+  select(safegraph_place_id, date, visits) %>%
+  mutate(visits = as.numeric(visits)) %>%
+  left_join(cross) %>%
+  filter(type == "grocery") %>%
+  group_by(date) %>%
+  summarise(visits = sum(visits)) %>%
+  rename(ds = date, y = visits)
+
+##
+
+proph_2 <- prophet(ready, weekly.seasonality = TRUE)
+proph_2$changepoints <- proph_2$changepoints[abs(proph_1$params$delta) >= quantile(proph_2$params$delta,
+                                                                                   #c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+                                                                                   )[5]]
+##
+
+blank_2 <- make_future_dataframe(proph_2, periods = 365 - nrow(ready))  
+preds_2 <- predict(proph_2, blank)
+
+##
+
+g <- 
+  ggplot() +
+  geom_point(aes(x = proph_2$history$ds, y = proph_2$history$y),
+             colour = pal[4], size = 0.5) +
+  geom_line(data = preds_2, 
+            aes(x = ds, y = yhat), colour = pal[2], size = 0.5, alpha = 0.25) +
+  geom_line(data = preds_2, 
+            aes(x = ds, y = trend), colour = pal[2], size = 1) +
+  geom_vline(xintercept = proph_2$changepoints, linetype = 2, size = 0.5, colour = pal[11]) +
+  geom_text(aes(x = proph_2$changepoints - 24 * 60 * 60, y = 20300, label = glue("{month(proph_2$changepoints, label = TRUE)} {day(proph_2$changepoints)}")), 
+            hjust = 1, colour = pal[11], fontface = 'bold', size = 2, check_overlap = TRUE) +
+  #scale_y_continuous(limits = c(0, 62000), breaks = c(20000, 40000, 60000)) +
+  labs(subtitle = "Grocers") +
+  xlab("") +
+  ylab("visits") +
+  theme_hor()
+
+##
+
+library(patchwork)
+
+##
+
+p <- n / g 
+p + plot_annotation(title = 'Assessing Changepoints in the Data',
+                    theme = theme(plot.title = element_text(face = 'bold', colour = 'black', hjust = 0.5))) + ggsave("changepoints.png", height = 8, width = 8, dpi = 300)
 
 ## 
 
