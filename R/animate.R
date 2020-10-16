@@ -199,4 +199,19 @@ anim_save("bars.gif", animation = anim,
           height = 800, width = 800, fps = 5,
           start_pause = 2, end_pause = 2)
 
+##
+
+map(1:8, function(x){
+  image_read(glue("miscellany/animations/complete/{x}.png")) %>%
+    image_annotate(text = glue("{stamp[x]}"), location = "+50+50", color = 'white', strokecolor = 'white', weight = 700, size = 100) %>%
+    image_write(glue("miscellany/animations/complete/{x}.png"))
+}) 
+
+list.files(path = 'miscellany/animations/complete', pattern = "*.png", full.names = TRUE) %>% 
+  image_read() %>% 
+  image_join() %>% 
+  image_animate(fps = 1) %>% 
+  image_write(glue("blues.gif"))
+
+##
   

@@ -231,9 +231,9 @@ leisure <-
 ##
 
 tig <- 
-  block_groups("PA", "Philadelphia", cb = TRUE, class = 'sf') %>%
+  block_groups("PA", "Philadelphia", cb = TRUE, class = 'sf') %>% 2272 
   st_transform(3702)
-
+  
 jan <- 
   leisure %>%
   filter(month == 1) %>%
@@ -496,3 +496,6 @@ ggplot(data = color) +
 ##
 
 diameter(net)
+
+##
+
