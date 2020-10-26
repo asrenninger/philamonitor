@@ -8,7 +8,6 @@ source("R/help.R")
 ##
 
 odmat <- vroom("data/processed/od_monthly.csv")
-
 phila <- read_sf("data/processed/phila.geojson")
 
 ##
@@ -97,7 +96,8 @@ graph <-
   set_vertex_attr("description", index = V(graph)[type=="FALSE"], value = "") %>%
   set_vertex_attr("naics", index = V(graph)[type=="FALSE"], value = "") %>%
   set_vertex_attr("cmap", index = V(graph)[type=="FALSE"], value = '#000000') %>%
-  set_vertex_attr("comp", value = comps$membership)
+  set_vertex_attr("comp", value = comps$membership) %>%
+  set_edge_attr("month", value = joint$month)
 
 graph <- simplify(graph)
 

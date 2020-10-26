@@ -37,7 +37,7 @@ demos %>%
   facet_wrap(~variable) +
   geom_sf(color = NA) +
   coord_sf(crs = 3857) +
-  scale_fill_gradientn(colours = pal[2:10], 
+  scale_fill_gradientn(colours = pal[6:10], 
                        guide = guide_continuous) +
   labs(title = "Philadelphia Demography", subtitle = "Resident mix by block group") +
   theme_map() +
