@@ -16,7 +16,7 @@ poi <- map_df(files, vroom) %>% glimpse()
 
 ##
 
-cbg <- block_groups("NY", "New York", cb = TRUE, class = 'sf')
+cbg <- block_groups("PA", "Philadelphia", cb = TRUE, class = 'sf')
 
 ##
 
@@ -37,8 +37,6 @@ files <- files[!str_detect(files, "_SUCCESS")]
 phila <- read_sf("data/processed/phila.geojson")
 
 ##
-
-vroom(files[length(files)]) %>% glimpse()
 
 moves <- map_df(files, function(x) {
   vroom(x) %>%
