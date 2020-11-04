@@ -18,6 +18,56 @@ during the pandemic.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
 
+Aggregation
+-----------
+
+Perhaps more valuable than probing individual points of interest is
+aggregating by areal units. Philadelphia has roughly 150 neighborhoods
+(we use
+[definitions](https://github.com/azavea/geo-data/tree/master/Neighborhoods_Philadelphia)
+from local firm Azavea) and each responded differently to the pandemic.
+Neighborhoods dominated by office work, like the Navy Yard along with
+Logan Square and Center City, saw precipitous declines in foot traffic,
+but those with strong amenities and residential communities have
+recovered. This suggests that demand for food, drink, and shopping may
+be shifting away from the core. (Note: see the appendix for larger
+tables.)
+
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Best</th>
+<th style="text-align: center;">Worst</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/besthoods10.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worsthoods10.png" /></td>
+</tr>
+</tbody>
+</table>
+
+Using regular tesselations, we can aggregate to a grid of 500 meter
+cells to see how this manifests across space. We are still aggregating
+from points of interest, so this is visits to businesses, parks, museums
+and the like, but by tile; this does not include visits to the
+particular patch of land without setting foot in a point of interest.
+The city hollowed out during the worst months of the pandemic but the
+Old City, Center City, University City axis still appears to have
+pockets of thriving activity in these maps.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
+
+We can also aggregate by use, grouping by classes like leisure and
+tourism. The pandemic had distinct effects on each class, but
+particularly leisure—like restaurants and bars—and other; other includes
+offices which also explains the steep fall. Interestingly, tourism is
+recovery while shops and grocers are not, perhaps as many switch to
+digital commerce.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
+
 Points of Interest
 ------------------
 
@@ -28,8 +78,8 @@ education, we call that education. Tourism includes museums and parks.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
 
-We can start by looking at which points of interest were most popular in
-the beginning of the year and how that is changed in recent months. The
+We also look at which points of interest were most popular in the
+beginning of the year and how that is changed in recent months. The
 table below shows just that, alongside a map that generally conveys that
 distribution locations across Philadelphia.
 
@@ -74,20 +124,10 @@ improved.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
 
-Aggregations
-------------
+Economic clusters
+-----------------
 
-Perhaps more valuable than probing individual points of interest is
-aggregating by areal units. Philadelphia has roughly 150 neighborhoods
-(we use
-[definitions](https://github.com/azavea/geo-data/tree/master/Neighborhoods_Philadelphia)
-from local firm Azavea) and each responded differently to the pandemic.
-Neighborhoods dominated by office work, like the Navy Yard along with
-Logan Square and Center City, saw precipitous declines in foot traffic,
-but those with strong amenities and residential communities have
-recovered. This suggests that demand for food, drink, and shopping may
-be shifting away from the core. (Note: see the appendix for larger
-tables.)
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/clusters.png)
 
 <table>
 <thead>
@@ -98,31 +138,14 @@ tables.)
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top10.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom10.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestclust20.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstclust20.png" /></td>
 </tr>
 </tbody>
 </table>
 
-Using regular tesselations, we can aggregate to a grid of 500 meter
-cells to see how this manifests across space. We are still aggregating
-from points of interest, so this is visits to businesses, parks, museums
-and the like, but by tile; this does not include visits to the
-particular patch of land without setting foot in a point of interest.
-The city hollowed out during the worst months of the pandemic but the
-Old City, Center City, University City axis still appears to have
-pockets of thriving activity in these maps.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
-
-We can also aggregate by use, grouping by classes like leisure and
-tourism. The pandemic had distinct effects on each class, but
-particularly leisure—like restaurants and bars—and other; other includes
-offices which also explains the steep fall. Interestingly, tourism is
-recovery while shops and grocers are not, perhaps as many switch to
-digital commerce.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
+Anomaly Detection
+-----------------
 
 Below we define leisure as visits to restaurants and bars, and see that
 there are distinct changes in the flow between March and April using a
@@ -164,8 +187,8 @@ Appendix:
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/top20.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bottom20.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/besthoods20.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worsthoods20.png" /></td>
 </tr>
 </tbody>
 </table>
