@@ -43,13 +43,38 @@ moves <- map_df(files, function(x) {
     filter(safegraph_place_id %in% phila$safegraph_place_id)
 })
 
-moves %>% 
-  group_by(safegraph_place_id) %>%
-  summarise(n = n()) %>%
-  ungroup() %>%
-  group_by(n) %>%
-  summarise(sum = n())
+odmat <- 
+  moves %>% 
+  select(safegraph_place_id, visitor_home_cbgs) %>%
+  mutate(visitor_home_cbgs = map(visitor_home_cbgs, function(x){
+    jsonlite::fromJSON(x) %>% 
+      as_tibble()
+  })) %>% 
+  unnest(visitor_home_cbgs) %>%
+  pivot_longer(!safegraph_place_id, names_to = "cbg", values_to = "visits") %>%
+  drop_na(visits)
 
+##
 
+library(tictoc)
+
+##
+
+tic()
+
+map_df(files, function(x) {
+  vroom(x) %>%
+    filter(safegraph_place_id %in% phila$safegraph_place_id)
+}) %>% 
+  select(safegraph_place_id, visitor_home_cbgs) %>%
+  mutate(visitor_home_cbgs = map(visitor_home_cbgs, function(x){
+    jsonlite::fromJSON(x) %>% 
+      as_tibble()
+  })) %>% 
+  unnest(visitor_home_cbgs) %>%
+  pivot_longer(!safegraph_place_id, names_to = "cbg", values_to = "visits") %>%
+  drop_na(visits)
+
+toc()
 
 

@@ -32,8 +32,8 @@ demos <- get_decennial(geography = "block group", variables = vars,
 ##
 
 demos %>%
-  mutate(pct = 100 * (value / summary_value)) %>%
-  ggplot(aes(fill = pct)) +
+  mutate(percent = 100 * (value / summary_value)) %>%
+  ggplot(aes(fill = percent)) +
   facet_wrap(~variable) +
   geom_sf(color = NA) +
   coord_sf(crs = 3857) +

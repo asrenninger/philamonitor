@@ -34,7 +34,7 @@ joint <-
   moves %>%
   mutate(visits_by_day = str_remove_all(visits_by_day, pattern = "\\[|\\]"))  %>%
   separate_rows(visits_by_day, sep = ",") %>%
-  mutate(month = month(date_range_start)) %>%
+  mutate(month = lubridate::month(date_range_start)) %>%
   group_by(safegraph_place_id, month) %>%
   mutate(day = 1:n()) %>%
   ungroup() %>%
@@ -92,11 +92,15 @@ tested %>%
 
 ##
 
+pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
+
+##
+
 ggplot(tested) +
   geom_sf(data = hoods %>% st_combine() %>% st_union(),
-          aes(), fill = NA, colour = pal[1], lwd = 1) +
+          aes(), fill = NA, colour = '#000000', lwd = 1) +
   geom_sf(aes(fill = factor(ntile(value, 9))), colour = NA, lwd = 0) +
-  scale_fill_manual(values = pal[2:10],
+  scale_fill_manual(values = rev(pal),
                     labels = as.character(scientific(quantile(tested$value,
                                                               c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
                                                               na.rm = TRUE), digits = 4)),
@@ -114,9 +118,9 @@ ggplot(tested) +
 anim <- 
   ggplot(tested) +
   geom_sf(data = hoods %>% st_combine() %>% st_union(),
-          aes(), fill = NA, colour = pal[1], lwd = 1) +
+          aes(), fill = NA, colour = '#000000', lwd = 1) +
   geom_sf(aes(fill = factor(ntile(value, 9))), colour = NA, lwd = 0) +
-  scale_fill_manual(values = pal[2:10],
+  scale_fill_manual(values = rev(pal),
                     labels = as.character(scientific(quantile(tested$value,
                                                               c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
                                                               na.rm = TRUE), digits = 4)),
@@ -140,7 +144,7 @@ long <-
                                    TRUE ~ location_name)) %>%
   mutate(visits_by_day = str_remove_all(visits_by_day, pattern = "\\[|\\]"))  %>%
   separate_rows(visits_by_day, sep = ",") %>%
-  mutate(month = month(date_range_start)) %>%
+  mutate(month = lubridate::month(date_range_start)) %>%
   group_by(safegraph_place_id, month) %>%
   mutate(day = 1:n()) %>%
   ungroup() %>%
@@ -176,9 +180,9 @@ base <-
       y = rank) +  
   geom_rect(alpha = .7) + 
   aes(fill = visits) +  
-  scale_fill_gradientn(colours = rev(pal[2:10]),
+  scale_fill_gradientn(colours = rev(pal),
                        guide = 'none') +  
-  geom_text(aes(x = visits - 10, y = rank, label = location_name), hjust = 1, col = pal[1], fontface = 'bold', size = 5) +
+  geom_text(aes(x = visits - 10, y = rank, label = location_name), hjust = 1, col = '#000000', fontface = 'bold', size = 5) +
   scale_y_reverse() +  
   labs(fill = NULL) +  
   labs(x = 'activity (visits)') +  
@@ -190,7 +194,7 @@ anim <-
   base +
   geom_text(x = 800 , y = -10, hjust = 1, 
             aes(label = paste("week", week, sep = " ")),
-            size = 20, col = pal[11]) +
+            size = 20, col = '#6e6e6e') +
   aes(group = location_name) +
   transition_time(week) +
   ease_aes("cubic-in-out")

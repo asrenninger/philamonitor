@@ -79,10 +79,11 @@ hoods <-
   mutate(visits = as.numeric(visits)) %>%
   group_by(neighborhood, date) %>%
   summarise(visits = sum(visits)) %>%
-  ungroup() 
+  ungroup()
 
 test <-
   hoods %>%
+  filter(neighborhood != "Pennypack Park") %>%
   mutate(week = week(date)) %>%
   group_by(neighborhood, week) %>%
   summarise(visits = mean(visits)) %>%
@@ -97,12 +98,25 @@ test <-
 
 ##
 
+shutdown <- 
+  read_csv("https://raw.githubusercontent.com/Keystone-Strategy/covid19-intervention-data/master/complete_npis_inherited_policies.csv") %>% 
+  filter(state == "Pennsylvania" & npi == "closing_of_public_venues" & county == "Philadelphia") %>%
+  drop_na(start_date) %>%
+  transmute(start_date = as_date(start_date, format = '%m/%d/%Y'),
+            end_date = as_date(end_date, format = '%m/%d/%Y')) %>%
+  mutate(start = week(start_date),
+         end = week(end_date))
+
+##
+
 spark <- function(df){
   
   sparkline <- 
     ggplot(data = df, 
            aes(x = week, y = visits)) +
     geom_line(colour = rev(pal[1:9])[df$decile[1]], size = 10) +
+    geom_vline(xintercept = shutdown$start, size = 5, linetype = 2) +
+    geom_vline(xintercept = shutdown$end, size = 5, linetype = 2) +
     theme_void()
     
   return(sparkline)
@@ -133,7 +147,7 @@ top10 <-
   left_join(plots) %>%
   arrange(desc(change)) %>%
   drop_na(neighborhood) %>%
-  slice(1:10)
+  slice(1:20)
 
 top10_plots <- select(top10, neighborhood, plot)
 top10 <- select(top10, neighborhood, highest, lowest, recent, change)
@@ -152,7 +166,7 @@ bot10 <-
   ungroup() %>%
   left_join(plots) %>%
   arrange(change) %>%
-  slice(1:10)
+  slice(1:20)
 
 bot10_plots <- select(bot10, neighborhood, plot)
 bot10 <- select(bot10, neighborhood, highest, lowest, recent, change)
@@ -163,16 +177,20 @@ library(gt)
 
 ##
 
+pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
+
+##
+
 bot10 %>% 
   mutate(ggplot = NA) %>% 
   gt() %>% 
-  tab_header(title = html("<b>Neighborhood Visitors: bottom ten</b>"),
+  tab_header(title = html("<b>Average Daily Visitors by Week</b>"),
              subtitle = md("Highest, lowest, and most recent footfall in Philadelphia<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
             locations = cells_column_labels(vars(`neighborhood`))) %>% 
   data_color(columns = vars(`change`),
-             colors = scales::col_numeric(c(rev(pal[2:10])), domain = NULL)) %>% 
+             colors = scales::col_numeric(c(pal), domain = NULL)) %>% 
   cols_align(align = "center",
              columns = 2:5) %>% 
   opt_table_font(font = list(c("IBM Plex Sans"))) %>% 
@@ -192,13 +210,13 @@ bot10 %>%
 top10 %>% 
   mutate(ggplot = NA) %>% 
   gt() %>% 
-  tab_header(title = html("<b>Neighborhood Visitors: top ten</b>"),
+  tab_header(title = html("<b>Average Daily Visitors by Week</b>"),
              subtitle = md("Highest, lowest, and most recent footfall in Philadelphia<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent")) %>% 
   tab_style(style = list(cell_text(weight = "bold")),
             locations = cells_column_labels(vars(`neighborhood`))) %>% 
   data_color(columns = vars(`change`),
-             colors = scales::col_numeric(c(rev(pal[2:10])), domain = NULL)) %>% 
+             colors = scales::col_numeric(c(pal), domain = NULL)) %>% 
   cols_align(align = "center",
              columns = 2:5) %>% 
   opt_table_font(font = list(c("IBM Plex Sans"))) %>% 
@@ -248,11 +266,14 @@ grid <-
                         TRUE ~ paste({id}))) %>%
   st_as_sf()
 
+intersection <- st_intersection(grid, background)
+
 dizz <- 
   grid %>% 
+  filter(id %in% intersection$id) %>%
   st_union() %>% 
   st_combine()
-
+  
 ##
 
 cross <- 
@@ -266,7 +287,7 @@ cross <-
 
 joint <- 
   moves %>%
-  mutate(month = month(date_range_start, label = TRUE)) %>%
+  mutate(month = lubridate::month(date_range_start, label = TRUE)) %>%
   group_by(safegraph_place_id, month) %>%
   summarise(visits = sum(raw_visit_counts)) %>%
   left_join(cross) %>%
@@ -279,7 +300,7 @@ ggplot(joint) +
   geom_sf(data = dizz, 
           aes(), fill = NA, colour = '#000000', lwd = 1) +
   geom_sf(aes(fill = factor(ntile(visits, 9))), colour = NA, lwd = 0) +
-  scale_fill_manual(values = pal[2:10],
+  scale_fill_manual(values = pal,
                     labels = as.character(quantile(joint$visits,
                                                            c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
                                                            na.rm = TRUE)),
@@ -380,7 +401,7 @@ gt(data = change, rowname_col = "location_name", groupname_col = "rank") %>%
   data_color(
     columns = vars(`change (january-august)`),
     colors = scales::col_numeric(
-      palette = rev(pal)[2:10],
+      palette = pal,
       domain = NULL
     )) %>%
   tab_options(heading.title.font.size = 30,
@@ -403,7 +424,7 @@ parks <-
 
 datum <- 
   odmat %>%
-  mutate(month = month(start, label = TRUE)) %>% 
+  mutate(month = lubridate::month(start, label = TRUE)) %>% 
   filter(safegraph_place_id %in% parks$safegraph_place_id) %>% 
   left_join(parks) %>% 
   select(location_name, safegraph_place_id, cbg, visits, month) %>%
@@ -416,7 +437,7 @@ ggplot() +
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
   geom_sf(data = datum, aes(fill = visits), colour = NA, lwd = 0) +
-  scale_fill_gradientn(colors = pal[2:10],
+  scale_fill_gradientn(colors = pal,
                        name = "visits",
                        guide = guide_continuous) +
   facet_wrap( ~ month, nrow = 1) +
@@ -434,7 +455,7 @@ comcast <-
 
 datum <- 
   odmat %>%
-  mutate(month = month(start, label = TRUE)) %>% 
+  mutate(month = lubridate::month(start, label = TRUE)) %>% 
   filter(safegraph_place_id %in% comcast$safegraph_place_id) %>% 
   left_join(comcast) %>% 
   select(location_name, safegraph_place_id, cbg, visits, month, geocode1) %>%
@@ -462,7 +483,7 @@ ggplot() +
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
   geom_sf(data = lines, aes(colour = visits, lwd = visits)) +
-  scale_colour_gradientn(colors = pal[2:10],
+  scale_colour_gradientn(colors = rev(pal),
                        name = "visits",
                        guide = guide_continuous) +
   scale_size_continuous(range = c(0.1, 1), guide = 'none') +
@@ -471,6 +492,8 @@ ggplot() +
   theme_map() +
   theme(legend.position = 'bottom') +
   ggsave("comcast.png", height = 4, width = 14, dpi = 300)
+
+##
 
 reading <- 
   phila %>% 
@@ -507,7 +530,7 @@ ggplot() +
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
   geom_sf(data = lines, aes(colour = visits, lwd = visits)) +
-  scale_colour_gradientn(colors = pal[2:10],
+  scale_colour_gradientn(colors = rev(pal),
                          name = "visits",
                          guide = guide_continuous) +
   scale_size_continuous(range = c(0.1, 1), guide = 'none') +
@@ -537,8 +560,7 @@ datum <-
                            TRUE ~ "other")) %>%
   select(location_name, type, latitude, longitude, visits) %>%
   st_as_sf(coords = c("longitude", "latitude"), remove = FALSE, crs = 4326) %>%
-  st_transform(3702) %>%
-  st_coordinates()
+  st_transform(3702)
 
 ##
 
@@ -586,7 +608,7 @@ ggplot() +
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
   geom_hex(data = datum %>%
              filter(type != "other" & type != "automotive"), aes(x = X, y = Y), alpha = 0.5) +
-  scale_fill_gradientn(colours = pal[2:10],
+  scale_fill_gradientn(colours = rev(pal),
                        guide = guide_continuous, 
                        limits = c(0, 50),
                        breaks = c(0, 10, 20, 30, 40, 50),
@@ -625,7 +647,7 @@ odmat <- vroom("data/processed/od_monthly.csv")
 ##
 
 moves %>%
-  mutate(month = month(date_range_start, label = TRUE)) %>%
+  mutate(month = lubridate::month(date_range_start, label = TRUE)) %>%
   select(safegraph_place_id, raw_visit_counts, month) %>%
   left_join(phila) %>%
   mutate(type = case_when(str_detect(top_category, "Restaurants|Drinking") ~ "leisure",
@@ -643,7 +665,7 @@ moves %>%
   summarise(visits = sum(raw_visit_counts)) %>%
   ggplot(aes(x = month, y = visits, colour = type)) +
   geom_path(aes(group = type), size = 1) +
-  scale_colour_manual(values = pal,
+  scale_colour_manual(values = c(pal, '#000000'),
                       name = "type of venue") +
   labs(title = "Tracking Activity", subtitle = "Venues by category") +
   xlab("") +
@@ -674,8 +696,6 @@ proph_1 <- prophet(ready, weekly.seasonality = TRUE, changepoint.prior.scale = 0
 proph_1$changepoints <- proph_1$changepoints[abs(proph_1$params$delta) >= quantile(proph_1$params$delta,
                                                                                    #c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
                                                                                    )[3]]
-
-?quantile
 
 ##
 

@@ -295,7 +295,7 @@ plots <-
   ungroup() %>%
   group_by(GEOID) %>%
   nest() %>%
-  mutate(plot = map(data, mapit)) %>%
+  mutate(plot = map(data, spark)) %>%
   select(-data)
 
 maps <- 
@@ -447,7 +447,7 @@ b <-
   geom_line(size = 2) +
   scale_colour_manual(values = pal[2:6],
                       guide = guide_discrete,
-                      name = "quintitle, percent black") +
+                      name = "quintile, percent black") +
   scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7, 8), labels = c("J", "F", "M", "A", "M", "J", "J", "A")) +
   xlab("") +
   theme_hor() +
