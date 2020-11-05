@@ -254,11 +254,22 @@ coord <-
   summarise() %>%
   mutate(geometry = st_convex_hull(geometry)) %>%
   st_centroid() %>%
-  st_transform(3701)
+  st_transform(3702)
 
 dizzy <- 
   background %>% 
-  st_transform(3701)
+  st_transform(3702)
+
+##
+
+shutdown <- 
+  read_csv("https://raw.githubusercontent.com/Keystone-Strategy/covid19-intervention-data/master/complete_npis_inherited_policies.csv") %>% 
+  filter(state == "Pennsylvania" & npi == "closing_of_public_venues" & county == "Philadelphia") %>%
+  drop_na(start_date) %>%
+  transmute(start_date = as_date(start_date, format = '%m/%d/%Y'),
+            end_date = as_date(end_date, format = '%m/%d/%Y')) %>%
+  mutate(start = week(start_date),
+         end = week(end_date))
 
 ##
 
@@ -284,7 +295,9 @@ spark <- function(df){
   sparkline <- 
     ggplot(data = df, 
            aes(x = week, y = visits)) +
-    geom_line(colour = rev(pal[1:9])[df$decile[1]], size = 10) +
+    geom_line(colour = pal[df$decile[1]], size = 10) +
+    geom_vline(xintercept = shutdown$start, size = 5, linetype = 2) +
+    geom_vline(xintercept = shutdown$end, size = 5, linetype = 2) +
     theme_void()
   
   return(sparkline)
@@ -297,8 +310,10 @@ plots <-
   ready %>%
   select(cluster, week, visits) %>%
   group_by(cluster) %>%
-  mutate(decile = ntile(mean(visits), 9)) %>%
+  mutate(change = (min(visits) - max(visits)) / max(visits)) %>%
   ungroup() %>%
+  mutate(decile = ntile(change, 9)) %>%
+  select(-change) %>%
   group_by(cluster) %>%
   nest() %>%
   mutate(plot = map(data, spark)) %>%
@@ -323,7 +338,7 @@ top10 <-
   left_join(plots) %>%
   select(map, cluster, high, low, average, change, plot) %>%
   arrange(desc(change)) %>%
-  slice(1:10)
+  slice(1:20)
 
 top10_plots <- select(top10, cluster, plot, map)
 top10 <- select(top10, cluster, high, low, average, change)
@@ -340,7 +355,7 @@ bot10 <-
   left_join(plots) %>%
   select(map, cluster, high, low, average, change, plot) %>%
   arrange(change) %>%
-  slice(1:10)
+  slice(1:20)
 
 bot10_plots <- select(bot10, cluster, plot, map)
 bot10 <- select(bot10, cluster, high, low, average, change)
@@ -359,7 +374,7 @@ bot10 %>%
   mutate(ggplot = NA, ggmap = NA) %>%
   select(ggmap, cluster, high, low, average, change, ggplot) %>%
   gt() %>% 
-  tab_header(title = html("<b>Nigh Life Hubs: bottom ten</b>"),
+  tab_header(title = html("<b>Nigh Life Hubs: bottom twenty</b>"),
              subtitle = md("Weekly visits to various economic clusters<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Period spanning January to August 2020"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
@@ -389,7 +404,7 @@ top10 %>%
   mutate(ggplot = NA, ggmap = NA) %>%
   select(ggmap, cluster, high, low, average, change, ggplot) %>%
   gt() %>% 
-  tab_header(title = html("<b>Nigh Life Hubs: top ten</b>"),
+  tab_header(title = html("<b>Nigh Life Hubs: top twenty</b>"),
              subtitle = md("Weekly visits to various economic clusters<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Period spanning January to August 2020"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
@@ -416,8 +431,3 @@ top10 %>%
   gtsave("best.png", expand = 10)
 
 ##
-
-
-
-
-
