@@ -136,9 +136,10 @@ grid <-
   as_tibble() %>%
   rownames_to_column() %>%
   rename(id = rowname) %>%
-  mutate(id = case_when(nchar(id) < 2 ~ paste("000", {id}, sep = ""),
-                        nchar(id) < 3 ~ paste("00", {id}, sep = ""),
-                        nchar(id) < 4 ~ paste("0", {id}, sep = ""),
+  mutate(id = case_when(nchar(id) < 2 ~ paste("0000", {id}, sep = ""),
+                        nchar(id) < 3 ~ paste("000", {id}, sep = ""),
+                        nchar(id) < 4 ~ paste("00", {id}, sep = ""),
+                        nchar(id) < 5 ~ paste("0", {id}, sep = ""),
                         TRUE ~ paste({id}))) %>%
   st_as_sf()
 
@@ -431,3 +432,4 @@ top10 %>%
   gtsave("best.png", expand = 10)
 
 ##
+
