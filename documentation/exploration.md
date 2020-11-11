@@ -52,11 +52,11 @@ more home goods and need to save money.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
 
-The table below buttresses this story, showing that brands associated
-with necessities (Target and Walmart) are growing in popularily, along
-with fast food restaurants, which one might expect in a time of
-constrained budgets. The map explores pairs of like brands and their
-locations in Philadelphia.
+The table below supports this story, showing that brands associated with
+necessities (Target and Walmart) are growing in popularily, along with
+fast food restaurants, which one might expect in a time of constrained
+budgets. The map explores pairs of like brands and their locations in
+Philadelphia.
 
 <table>
 <thead>
@@ -126,13 +126,12 @@ pockets of thriving activity in these maps.
 poi
 ---
 
-The airport fell in the ranks, though all others saw few visitors in
-August than in January—even more striking when we consider weather,
-which could have produced the opposite effect in other years. Malls and
-shopping centers appear to have weathered the pandemic well, but the
-shift to remote work should also appear in the data. We can look at
-visits to the Comcast Center and the Plaza below it; visits in April and
-May, as the coronavirus took hold in the city, fell to the point of
+Finally, this section looks at individual points of interest, how they
+perform over time and how they cluster together to form commmercial
+corridors. Big box stories appear to have weathered the pandemic well,
+but the shift to remote work should also appear in the data. We can look
+at visits to the Comcast Center and the Plaza below it; visits in April
+and May, as the coronavirus took hold in the city, fell to the point of
 irrelevance.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/comcast.png)
@@ -141,15 +140,28 @@ Yet with offices vacant, parks should have swelled with visitors. We see
 mixed evidence of this in the data. Philadelphia has four central
 squares—Rittenhouse, Washington, Logan, and Franklin—which provide
 important community amenity; all saw fewer visits in April and May than
-later in the summer, suggesting winter patterns even as the weather
-improved.
+later in the summer, suggesting winter patterns continued even as the
+weather improved. As a signal for tourism, we can look at Reading
+Terminal Market; vendors between its walls saw marked declines in visits
+beginning in April.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
-
-Economic clusters
------------------
+These businesses cluster together and we can explore the strength of
+this phenomenon using an algorithm; here we use the popular method
+`dbscan` (density-based spatial clustering applications with noise),
+which takes both a maximum distance between points and a minimum size of
+cluster to group, in this case, points of interest together. Looking at
+night life, this technique identifies many of the primary commercial
+hubs in Philadelphia, from Center City and University City, to Passyunk
+and Fishtown, along with numerous ancillary corridors, often stretching
+along major roads.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/clusters.png)
+
+When we plot trends in these clusters over time, it is clear that many
+of the most successful areas are toward the periphery, perhaps dormitory
+communities supported by remote work, and several of the least
+successful are situated in the core.
 
 <table>
 <thead>
