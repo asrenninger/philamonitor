@@ -18,8 +18,72 @@ during the pandemic.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
 
-Aggregation
------------
+This analysis comprises different scales, each elaborating on distinct
+aspects of mobility and activity in Philadelphia. We can look
+*globally*, across the city, to explore trends throughout; we can also
+think *locally*, dividing the city up into cells or neighborhoods to
+probe variations within the city. Finally, we can avoid aggregation,
+looking at individual points or interest or grouping them
+algorithmically. Below, we attempt to understand the data by engaging
+them at each scale.
+
+### Three Units of Analysis
+
+1.  [Global, city](#global)
+2.  [Local, neighborhood](#local)
+3.  [Point of Interest](#poi)
+
+global
+------
+
+In this section, we look at trends across the city, beginning with the
+distribution of venues and businesses across it. We can classify each
+point of interest by its description. If it contains restuarant or bar,
+we call that leisure. Anything educational, from tutoring to public,
+private or charter schools to tertiary education, we call that
+education. Tourism includes museums and parks.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
+
+We can also show how visitation is change across time by tracking
+footfall across brands. Notice in this animation that dollar stores rise
+gradually throughout the year, an expected change as residents both need
+more home goods and need to save money.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
+
+The table below buttresses this story, showing that brands associated
+with necessities (Target and Walmart) are growing in popularily, along
+with fast food restaurants, which one might expect in a time of
+constrained budgets. The map explores pairs of like brands and their
+locations in Philadelphia.
+
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Rankings</th>
+<th style="text-align: center;">Locations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png" /></td>
+</tr>
+</tbody>
+</table>
+
+We can also aggregate by use, grouping by classes like leisure and
+tourism. The pandemic had distinct effects on each class, but
+particularly leisure—like restaurants and bars—and other; other includes
+offices which also explains the steep fall. Interestingly, tourism is
+recovering while shops and grocers are not, perhaps as many switch to
+digital commerce.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
+
+local
+-----
 
 Perhaps more valuable than probing individual points of interest is
 aggregating by areal units. Philadelphia has roughly 150 neighborhoods
@@ -59,50 +123,8 @@ pockets of thriving activity in these maps.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
-We can also aggregate by use, grouping by classes like leisure and
-tourism. The pandemic had distinct effects on each class, but
-particularly leisure—like restaurants and bars—and other; other includes
-offices which also explains the steep fall. Interestingly, tourism is
-recovery while shops and grocers are not, perhaps as many switch to
-digital commerce.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
-
-Points of Interest
-------------------
-
-First, we can classify each point of interest by its description. If it
-contains restuarant or bar, we call that leisure. Anything educational,
-from tutoring to public, private or charter schools to tertiary
-education, we call that education. Tourism includes museums and parks.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
-
-We also look at which points of interest were most popular in the
-beginning of the year and how that is changed in recent months. The
-table below shows just that, alongside a map that generally conveys that
-distribution locations across Philadelphia.
-
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: center;">Rankings</th>
-<th style="text-align: center;">Locations</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png" /></td>
-</tr>
-</tbody>
-</table>
-
-We can also show how visitation is change across time by tracking
-footfall across brands. Notice in this animation that dollar stores rise
-gradually throughout the year.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
+poi
+---
 
 The airport fell in the ranks, though all others saw few visitors in
 August than in January—even more striking when we consider weather,
