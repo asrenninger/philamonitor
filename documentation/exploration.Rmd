@@ -70,6 +70,8 @@ These businesses cluster together and we can explore the strength of this phenom
 
 When we plot trends in these clusters over time, it is clear that many of the most successful areas are toward the periphery, perhaps dormitory communities supported by remote work, and several of the least successful are situated in the core.
 
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/relationships.png)
+
  Best             |  Worst
 :-------------------------:|:-------------------------:
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestclust20.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstclust20.png)

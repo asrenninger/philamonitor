@@ -163,6 +163,8 @@ of the most successful areas are toward the periphery, perhaps dormitory
 communities supported by remote work, and several of the least
 successful are situated in the core.
 
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/relationships.png)
+
 <table>
 <thead>
 <tr class="header">
