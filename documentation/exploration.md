@@ -50,8 +50,9 @@ footfall across brands. Notice in this animation that dollar stores rise
 gradually throughout the year, an expected change as residents both need
 more home goods and need to save money.
 
+<center>
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
-
+</center>
 The table below buttresses this story, showing that brands associated
 with necessities (Target and Walmart) are growing in popularily, along
 with fast food restaurants, which one might expect in a time of
@@ -86,8 +87,8 @@ local
 -----
 
 Perhaps more valuable than probing individual points of interest is
-aggregating by areal units. Philadelphia has roughly 150 neighborhoods
-(we use
+aggregating by areal units, which we do in this section. Philadelphia
+has roughly 150 neighborhoods (we use
 [definitions](https://github.com/azavea/geo-data/tree/master/Neighborhoods_Philadelphia)
 from local firm Azavea) and each responded differently to the pandemic.
 Neighborhoods dominated by office work, like the Navy Yard along with

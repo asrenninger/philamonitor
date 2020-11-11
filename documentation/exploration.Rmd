@@ -31,8 +31,9 @@ In this section, we look at trends across the city, beginning with the distribut
 
 We can also show how visitation is change across time by tracking footfall across brands. Notice in this animation that dollar stores rise gradually throughout the year, an expected change as residents both need more home goods and need to save money. 
 
+<center>
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
-
+</center>
 
 The table below buttresses this story, showing that brands associated with necessities (Target and Walmart) are growing in popularily, along with fast food restaurants, which one might expect in a time of constrained budgets. The map explores pairs of like brands and their locations in Philadelphia.
 
@@ -40,13 +41,13 @@ The table below buttresses this story, showing that brands associated with neces
 :-------------------------:|:-------------------------:
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png) 
 
-We can also aggregate by use, grouping by classes like leisure and tourism. The pandemic had distinct effects on each class, but particularly leisure—like restaurants and bars—and other; other includes offices which also explains the steep fall. Interestingly, tourism is recovering while shops and grocers are not, perhaps as many switch to digital commerce.   
+We can also aggregate by use, grouping by classes like leisure and tourism. The pandemic had distinct effects on each class, but particularly leisure—like restaurants and bars—and other; other includes offices which also explains the steep fall. Interestingly, tourism is recovering while shops and grocers are not, perhaps as many switch to digital commerce. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
 
 ## local
 
-Perhaps more valuable than probing individual points of interest is aggregating by areal units. Philadelphia has roughly 150 neighborhoods (we use [definitions](https://github.com/azavea/geo-data/tree/master/Neighborhoods_Philadelphia) from local firm Azavea) and each responded differently to the pandemic. Neighborhoods dominated by office work, like the Navy Yard along with Logan Square and Center City, saw precipitous declines in foot traffic, but those with strong amenities and residential communities have recovered. This suggests that demand for food, drink, and shopping may be shifting away from the core. (Note: see the appendix for larger tables.)
+Perhaps more valuable than probing individual points of interest is aggregating by areal units, which we do in this section. Philadelphia has roughly 150 neighborhoods (we use [definitions](https://github.com/azavea/geo-data/tree/master/Neighborhoods_Philadelphia) from local firm Azavea) and each responded differently to the pandemic. Neighborhoods dominated by office work, like the Navy Yard along with Logan Square and Center City, saw precipitous declines in foot traffic, but those with strong amenities and residential communities have recovered. This suggests that demand for food, drink, and shopping may be shifting away from the core. (Note: see the appendix for larger tables.)
 
 Best             |  Worst
 :-------------------------:|:-------------------------:
