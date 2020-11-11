@@ -12,14 +12,6 @@ phila <- read_sf("data/processed/phila.geojson")
 
 ##
 
-blocks <- block_groups("PA", "Philadelphia", cb = TRUE, class = 'sf')
-
-##
-
-library(tidycensus)
-
-##
-
 vars <- c(White = "P005003",
           Black = "P005004",
           Asian = "P005006",
@@ -46,9 +38,46 @@ demos %>%
 
 ##
 
+blocks <- block_groups("PA", "Philadelphia", cb = TRUE, class = 'sf')
+tracts <- tracts("PA", "Philadelphia", cb = TRUE, class = 'sf')
+##
+
+library(tidycensus)
+
+##
+
+vars <- load_variables(year = 2018, dataset = 'acs5')
+
+vars %>% filter(str_detect(str_to_lower(label), "african american"))
+vars %>% filter(str_detect(str_to_lower(label), "education"))
+
+##
+
+acs <- c(income = "B06011_001",
+         black = "B02001_003",
+         education = "B06009_005",
+         population = "B01001_001")
+
+demos <- get_acs(geography = 'tract', variables = acs, 
+                 state = "PA", county = "Philadelphia County", geometry = TRUE,
+                 summary_var = "B01001_001")
+
+demos <- demos %>%
+  mutate(estimate = case_when(variable == "black" ~ (estimate / summary_est),
+                              variable == "education" ~ (estimate / summary_est),
+                              TRUE ~ estimate)) %>%
+  select(GEOID, variable, estimate) %>%
+  #pivot_wider(id_cols = 'GEOID', names_from = 'variable', values_from = 'estimate')
+  spread(key = 'variable', value = 'estimate')
+
+##
+
 expectancy <- 
   read_csv("data/demography/life_expectancy.csv") %>%
   clean_names() %>%
   transmute(GEOID = tract_id,
-            expectancy = e_0,
-            st_error = se_e_0)
+            expectancy = e_0)
+
+##
+
+
