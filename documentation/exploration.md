@@ -49,9 +49,9 @@ We can also show how visitation is change across time by tracking
 footfall across brands. Notice in this animation that dollar stores rise
 gradually throughout the year, an expected change as residents both need
 more home goods and need to save money.
-<center>
+
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
-</center>
+
 The table below buttresses this story, showing that brands associated
 with necessities (Target and Walmart) are growing in popularily, along
 with fast food restaurants, which one might expect in a time of
