@@ -147,16 +147,14 @@ beginning in April.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
 These businesses cluster together and we can explore the strength of
-this phenomenon using an algorithm; here we use the popular method
-`dbscan` (density-based spatial clustering applications with noise),
-which takes both a maximum distance between points and a minimum size of
-cluster to group, in this case, points of interest together. Looking at
-night life, this technique identifies many of the primary commercial
-hubs in Philadelphia, from Center City and University City, to Passyunk
-and Fishtown, along with numerous ancillary corridors, often stretching
-along major roads.
+this phenomenon by looking at commercial corridors in Philadelphia, of
+which the city has designated roughly 280. Looking at Night Life, the
+largest are Market West and Market East, on either side of city hall,
+with 1712 and 1263 restaurants and bars respectively, following by Old
+City at 654 and another in University City with 493: most of the
+business activity is concentrated in a few locales.
 
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/clusters.png)
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/corridors.png)
 
 When we plot trends in these clusters over time, it is clear that many
 of the most successful areas are toward the periphery, perhaps dormitory
