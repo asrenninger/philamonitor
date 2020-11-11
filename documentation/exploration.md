@@ -172,8 +172,8 @@ successful are situated in the core.
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestclust20.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstclust20.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestcorr20.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstcorr20.png" /></td>
 </tr>
 </tbody>
 </table>
