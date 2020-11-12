@@ -37,7 +37,7 @@ The table below supports this story, showing that brands associated with necessi
 
  Rankings             |  Locations
 :-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/businesses.gif) 
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/businesses.gif =400x) 
 
 We can also aggregate by use, grouping by classes like leisure and tourism. The pandemic had distinct effects on each class, but particularly leisure—like restaurants and bars—and other; other includes offices which also explains the steep fall. Interestingly, tourism is recovering while shops and grocers are not, perhaps as many switch to digital commerce. 
 
