@@ -68,7 +68,7 @@ Philadelphia.
 <tbody>
 <tr class="odd">
 <td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png" /></td>
-<td style="text-align: center;">!<img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/businesses.gif" width="600"></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/businesses.gif" width="800"></td>
 </tr>
 </tbody>
 </table>
