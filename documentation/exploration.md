@@ -48,7 +48,12 @@ education. Tourism includes museums and parks.
 We can also show how visitation is change across time by tracking
 footfall across brands. Notice in this animation that dollar stores rise
 gradually throughout the year, an expected change as residents both need
-more home goods and need to save money.
+more home goods and need to save money; another important shift is away
+from non-essential retail towards essential businesses like pharmacies.
+Starbucks and Wawa occupy top spots for the first several weeks of the
+year but when the shelter-in-place order sets in, patronage immediately
+collapses and they are replaced in the ranks essential shops RiteAid and
+ShopRite.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
 
