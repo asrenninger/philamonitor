@@ -15,6 +15,10 @@ With the goal of understanding the time-space patterns of resident movement in P
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
 
+When we link each connection together, we create a network of interactions, weighted by the size of the flow (the number of visits), and in probing the changing structure of this network we can understand the impact of the pandemic on urban life in Philadelphia.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/flows.gif)
+
 This analysis comprises different scales, each elaborating on distinct aspects of mobility and activity in Philadelphia. We can look *globally*, across the city, to explore trends throughout; we can also think *locally*, dividing the city up into cells or neighborhoods to probe variations within the city. Finally, we can avoid aggregation, looking at individual points or interest or grouping them algorithmically. Below, we attempt to understand the data by engaging them at each scale. 
 
 ### Three Units of Analysis
@@ -71,7 +75,11 @@ The relationship between centrality—distance to the Philadelphia's core—and 
 
 ## poi
 
-Finally, this section looks at individual points of interest, how they perform over time and how they cluster together to form commmercial corridors. Big box stories appear to have weathered the pandemic well, but the shift to remote work should also appear in the data. We can look at visits to the Comcast Center and the Plaza below it; visits in April and May, as the coronavirus took hold in the city, fell to the point of irrelevance. 
+Finally, this section looks at individual points of interest, how they perform over time and whether or not we can identify certain bellwether businesses within the city. We start by looking at the network of connections across the city. Drawing a line between each origin (neighborhood) and destination (point of interest), there is a dense web—a nearly saturated graph where all neighborhoods send visitors to all other corners of the city. This web becomes sparser as the pandemic came to the fore and there during the late summer there were fewer links than during the late winter. 
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/flows.png)
+
+As we saw above, the data show that big box stores like Target and Walmart appear to have weathered the pandemic well, but the shift to remote work should also appear in the data. We can look at visits to the Comcast Center and the Plaza below it; visits in April and May, as the coronavirus took hold in the city, fell substantially. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/comcast.png)
 
@@ -91,7 +99,7 @@ From here, we can fit a similar model to each neighborhood based on the food tra
 
 We can see that there is a period of abrupt change in April and May, coinciding with the pandemic but starting later and ending earlier in different neighborhoods. The appendix has a chart that logs each significant change point (above 10 percent change in the trend week-on-week) for each neighborhood, and maps the volatility associated with them for additional clarity.   
 
-## Appendix: 
+## Appendix 
 
  Best             |  Worst
 :-------------------------:|:-------------------------:

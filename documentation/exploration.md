@@ -18,6 +18,13 @@ during the pandemic.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
 
+When we link each connection together, we create a network of
+interactions, weighted by the size of the flow (the number of visits),
+and in probing the changing structure of this network we can understand
+the impact of the pandemic on urban life in Philadelphia.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/flows.gif)
+
 This analysis comprises different scales, each elaborating on distinct
 aspects of mobility and activity in Philadelphia. We can look
 *globally*, across the city, to explore trends throughout; we can also
@@ -169,12 +176,22 @@ poi
 ---
 
 Finally, this section looks at individual points of interest, how they
-perform over time and how they cluster together to form commmercial
-corridors. Big box stories appear to have weathered the pandemic well,
-but the shift to remote work should also appear in the data. We can look
-at visits to the Comcast Center and the Plaza below it; visits in April
-and May, as the coronavirus took hold in the city, fell to the point of
-irrelevance.
+perform over time and whether or not we can identify certain bellwether
+businesses within the city. We start by looking at the network of
+connections across the city. Drawing a line between each origin
+(neighborhood) and destination (point of interest), there is a dense
+web—a nearly saturated graph where all neighborhoods send visitors to
+all other corners of the city. This web becomes sparser as the pandemic
+came to the fore and there during the late summer there were fewer links
+than during the late winter.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/flows.png)
+
+As we saw above, the data show that big box stores like Target and
+Walmart appear to have weathered the pandemic well, but the shift to
+remote work should also appear in the data. We can look at visits to the
+Comcast Center and the Plaza below it; visits in April and May, as the
+coronavirus took hold in the city, fell substantially.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/comcast.png)
 
@@ -220,8 +237,8 @@ significant change point (above 10 percent change in the trend
 week-on-week) for each neighborhood, and maps the volatility associated
 with them for additional clarity.
 
-Appendix:
----------
+Appendix
+--------
 
 <table>
 <thead>
