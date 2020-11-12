@@ -37,7 +37,7 @@ The table below supports this story, showing that brands associated with necessi
 
  Rankings             |  Locations
 :-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png) 
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/businesses.gif) 
 
 We can also aggregate by use, grouping by classes like leisure and tourism. The pandemic had distinct effects on each class, but particularly leisure—like restaurants and bars—and other; other includes offices which also explains the steep fall. Interestingly, tourism is recovering while shops and grocers are not, perhaps as many switch to digital commerce. 
 
@@ -55,6 +55,20 @@ Using regular tesselations, we can aggregate to a grid of 500 meter cells to see
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
+Businesses cluster together and we can explore the strength of this phenomenon by looking at commercial corridors in Philadelphia, of which the city has designated roughly 280. Looking at Night Life, the largest are Market West and Market East, on either side of city hall, with 1712 and 1263 restaurants and bars respectively, following by Old City at 654 and another in University City with 493: most of the business activity is concentrated in a few locales. 
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/corridors.png) 
+
+When we plot trends in these clusters over time, it is clear that many of the most successful areas are toward the periphery, perhaps dormitory communities supported by remote work, and several of the least successful are situated in the core.
+
+ Best             |  Worst
+:-------------------------:|:-------------------------:
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestcorr10.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstcorr10.png)
+
+The relationship between centrality—distance to the Philadelphia's core—and activity is negligible: many corridors in or around Center City did indeed see a decline, but so too did those that likely serve a local clientelle. 
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/relationships.png)
+
 ## poi
 
 Finally, this section looks at individual points of interest, how they perform over time and how they cluster together to form commmercial corridors. Big box stories appear to have weathered the pandemic well, but the shift to remote work should also appear in the data. We can look at visits to the Comcast Center and the Plaza below it; visits in April and May, as the coronavirus took hold in the city, fell to the point of irrelevance. 
@@ -64,17 +78,6 @@ Finally, this section looks at individual points of interest, how they perform o
 Yet with offices vacant, parks should have swelled with visitors. We see mixed evidence of this in the data. Philadelphia has four central squares—Rittenhouse, Washington, Logan, and Franklin—which provide important community amenity; all saw fewer visits in April and May than later in the summer, suggesting winter patterns continued even as the weather improved. As a signal for tourism, we can look at Reading Terminal Market; vendors between its walls saw marked declines in visits beginning in April.     
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
-These businesses cluster together and we can explore the strength of this phenomenon by looking at commercial corridors in Philadelphia, of which the city has designated roughly 280. Looking at Night Life, the largest are Market West and Market East, on either side of city hall, with 1712 and 1263 restaurants and bars respectively, following by Old City at 654 and another in University City with 493: most of the business activity is concentrated in a few locales. 
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/corridors.png) 
-
-When we plot trends in these clusters over time, it is clear that many of the most successful areas are toward the periphery, perhaps dormitory communities supported by remote work, and several of the least successful are situated in the core.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/relationships.png)
-
- Best             |  Worst
-:-------------------------:|:-------------------------:
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestcorr20.png)|![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstcorr20.png)
 
 ## Anomaly Detection
 

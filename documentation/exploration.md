@@ -68,7 +68,7 @@ Philadelphia.
 <tbody>
 <tr class="odd">
 <td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/context.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/businesses.gif" /></td>
 </tr>
 </tbody>
 </table>
@@ -123,6 +123,43 @@ pockets of thriving activity in these maps.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
+Businesses cluster together and we can explore the strength of this
+phenomenon by looking at commercial corridors in Philadelphia, of which
+the city has designated roughly 280. Looking at Night Life, the largest
+are Market West and Market East, on either side of city hall, with 1712
+and 1263 restaurants and bars respectively, following by Old City at 654
+and another in University City with 493: most of the business activity
+is concentrated in a few locales.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/corridors.png)
+
+When we plot trends in these clusters over time, it is clear that many
+of the most successful areas are toward the periphery, perhaps dormitory
+communities supported by remote work, and several of the least
+successful are situated in the core.
+
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Best</th>
+<th style="text-align: center;">Worst</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestcorr10.png" /></td>
+<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstcorr10.png" /></td>
+</tr>
+</tbody>
+</table>
+
+The relationship between centrality—distance to the Philadelphia’s
+core—and activity is negligible: many corridors in or around Center City
+did indeed see a decline, but so too did those that likely serve a local
+clientelle.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/relationships.png)
+
 poi
 ---
 
@@ -146,37 +183,6 @@ Terminal Market; vendors between its walls saw marked declines in visits
 beginning in April.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
-These businesses cluster together and we can explore the strength of
-this phenomenon by looking at commercial corridors in Philadelphia, of
-which the city has designated roughly 280. Looking at Night Life, the
-largest are Market West and Market East, on either side of city hall,
-with 1712 and 1263 restaurants and bars respectively, following by Old
-City at 654 and another in University City with 493: most of the
-business activity is concentrated in a few locales.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/corridors.png)
-
-When we plot trends in these clusters over time, it is clear that many
-of the most successful areas are toward the periphery, perhaps dormitory
-communities supported by remote work, and several of the least
-successful are situated in the core.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/relationships.png)
-
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: center;">Best</th>
-<th style="text-align: center;">Worst</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bestcorr20.png" /></td>
-<td style="text-align: center;"><img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worstcorr20.png" /></td>
-</tr>
-</tbody>
-</table>
 
 Anomaly Detection
 -----------------
