@@ -64,7 +64,7 @@ Businesses cluster together and we can explore the strength of this phenomenon b
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/corridors.png) 
 
-When we plot trends in these clusters over time, it is clear that many of the most successful areas are toward the periphery, perhaps dormitory communities supported by remote work, and several of the least successful are situated in the core. Notably among the worst performers are the two Center City corridors, which depend on office work, and the Sports Complex, which saw sports leagues take measures of protect players and ban fans early on—and many of these restrictions are still in place.  
+When we plot trends in these clusters over time, it is clear that many of the most successful areas are toward the periphery, perhaps dormitory communities supported by remote work, and several of the least successful are situated in the core. Notably among the worst performers are the two central corridors, which depend on office work, and the Sports Complex, which saw sports leagues take measures of protect players and ban fans early on—and many of these restrictions are still in place. Peripheral plazas like Oxford and Levick, home to a supermarket, and City and Haverford are among the best. 
 
  Best             |  Worst
 :-------------------------:|:-------------------------:
