@@ -11,7 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Exploration
 
-With the goal of understanding the time-space patterns of resident movement in Philadelphia, the following section presents a series of maps and tables. Note that SafeGraph captures a slice of the population, attempting to monitor a representative sample of the population across the country; that said, we can reduce noise through various aggregations and by tracking trends, which are naturally indexed to population of devices rather than the population as a whole. We definitions specified in the following infographic: the number of visitors is the count of devices flowing to a point of interest—be it from a given Census Block Group or total—while a connection is an origin-destination line between a Census Block Group and a point of interest, regardless of its weight. We use both here to determine how many people are moving about the city and from where to where, which calls to how integrated the city is during the pandemic. 
+As the coronavirus spread in Philadelphia this year, travel patterns throughout the city changed. With this shock to human mobility came one to business activity, as many areas saw reliable patrons forced to stay home—especially during the shelter-in-place order which began in March and continued into May. This analysis will focus primarily on night life—the restaurants and bars that both provide jobs and support vibrant streets—but we also monitor certain bellwether industries, like those with office work, that doubtless provide a foundation for such night life.     
+
+With the goal of understanding the time-space patterns of resident movement in Philadelphia, the following section presents mobile phone data from SafeGraph, a provider of such records. Note that SafeGraph monitors a representative sample (30%) of the population across the country, so the values shown below are not the true number of visits or journeys, but a slice; that said, we can reduce noise through various aggregations and by tracking trends, which are naturally indexed to population of devices rather than the population as a whole. We use definitions specified in the following infographic: the number of **visitors** is the count of devices flowing to a point of interest—be it from a given Census Block Group or total—while a **connection** is an origin-destination line between a Census Block Group and a point of interest, regardless of its weight. We use both here to determine how many people are moving about the city and from where to where, which calls to how integrated the city is during the pandemic. If one neighborhood is driving business along a corridor or at a veneue, it may obscure the fact that diversity of clientele—captured in the number of unique neighborhoods sending visitors there—is falling.   
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
 
@@ -29,21 +31,20 @@ This analysis comprises different scales, each elaborating on distinct aspects o
 
 ## global
 
-In this section, we look at trends across the city, beginning with the distribution of venues and businesses across it. We can classify each point of interest by its description. If it contains restuarant or bar, we call that leisure. Anything educational, from tutoring to public, private or charter schools to tertiary education, we call that education. Tourism includes museums and parks. 
+In this section, we look at trends across the city, beginning with the distribution of venues and businesses. We classify each point of interest by its description, which SafeGraph provides. If that description contains "restuarant" or "bar", we call that leisure. Anything educational, from tutoring to public, private or charter schools to tertiary education, we call that education. Tourism includes museums and parks. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
-
-We can also show how visitation is change across time by tracking footfall across brands. Notice in this animation that dollar stores rise gradually throughout the year, an expected change as residents both need more home goods and need to save money; another important shift is away from non-essential retail towards essential businesses like pharmacies. Starbucks and Wawa occupy top spots for the first several weeks of the year but when the shelter-in-place order sets in, patronage immediately collapses and they are replaced in the ranks essential shops RiteAid and ShopRite.   
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
-
-The table below supports this story, showing that brands associated with necessities (Target and Walmart) are growing in popularily, along with fast food restaurants, which one might expect in a time of constrained budgets. The map explores pairs of like brands and their locations in Philadelphia.
+We can also show how visitation is change across time by tracking visits across brands. The table below shows that brands associated with necessities (Target and Walmart) are growing in popularily, along with fast food restaurants, which one might expect in a time of constrained budgets. The map explores pairs of like brands and their locations in Philadelphia.
 
  Rankings             |  Locations
 :-------------------------:|:-------------------------:
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/connections.png)|<img src="https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/businesses.gif" width="1200">
 
-We can also aggregate by use, grouping by classes like leisure and tourism. The pandemic had distinct effects on each class, but particularly leisure—like restaurants and bars—and other; other includes offices which also explains the steep fall. Interestingly, tourism is recovering while shops and grocers are not, perhaps as many switch to digital commerce. 
+The following animation supports this story. Dollar stores rise gradually throughout the year, an expected change as residents both need more home goods and need to save money; another important shift is away from non-essential retail towards essential businesses like pharmacies. Starbucks and Wawa occupy top spots for the first several weeks of the year but when the shelter-in-place order sets in, patronage immediately collapses and they are replaced in the ranks essential shops RiteAid and ShopRite.   
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/bars.gif)
+
+We also aggregate by use, grouping by classes like leisure and tourism. The pandemic had distinct effects on each class, but particularly leisure—like restaurants and bars—and other; other includes offices which also explains the steep fall. Interestingly, tourism is recovering while shops and grocers are not, perhaps as many switch to digital commerce. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/seriesxtype.png)
 
@@ -55,15 +56,15 @@ Best             |  Worst
 :-------------------------:|:-------------------------:
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/besthoods10.png)| ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/worsthoods10.png)
 
-Using regular tesselations, we can aggregate to a grid of 500 meter cells to see how this manifests across space. We are still aggregating from points of interest, so this is visits to businesses, parks, museums and the like, but by tile; this does not include visits to the particular patch of land without setting foot in a point of interest. The city hollowed out during the worst months of the pandemic but the Old City, Center City, University City axis still appears to have pockets of thriving activity in these maps.   
+Using regular tesselations, we aggregate to a grid of 500 meter cells to see how this manifests across space. We are still aggregating from points of interest, so this is visits to businesses, parks, museums and the like, but by tile; this does not include visits to the particular patch of land without setting foot in a point of interest. The city hollowed out during the worst months of the pandemic but the Old City, Center City, University City axis still appears to have pockets of thriving activity in these maps.   
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/grid.png)
 
-Businesses cluster together and we can explore the strength of this phenomenon by looking at commercial corridors in Philadelphia, of which the city has designated roughly 280. Looking at Night Life, the largest are Market West and Market East, on either side of city hall, with 1712 and 1263 restaurants and bars respectively, following by Old City at 654 and another in University City with 493: most of the business activity is concentrated in a few locales. 
+Businesses cluster together and we can explore the strength of this phenomenon by looking at commercial corridors in Philadelphia, of which the city has designated roughly 280. Looking at night life, the largest are Market West and Market East, on either side of city hall, with 1712 and 1263 restaurants and bars respectively, following by Old City at 654 and another in University City with 493: most of the business activity is concentrated in a few locales. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/corridors.png) 
 
-When we plot trends in these clusters over time, it is clear that many of the most successful areas are toward the periphery, perhaps dormitory communities supported by remote work, and several of the least successful are situated in the core.
+When we plot trends in these clusters over time, it is clear that many of the most successful areas are toward the periphery, perhaps dormitory communities supported by remote work, and several of the least successful are situated in the core. Notably among the worst performers are the two Center City corridors, which depend on office work, and the Sports Complex, which saw sports leagues take measures of protect players and ban fans early on—and many of these restrictions are still in place.  
 
  Best             |  Worst
 :-------------------------:|:-------------------------:
@@ -87,13 +88,15 @@ Yet with offices vacant, parks should have swelled with visitors. We see mixed e
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
 
-## Anomaly Detection
+## Anomaly Detection (WIP)
+
+In order to understand trends in Philadelphia, we need to identify areas that are rising or falling in popularity as mobility patterns change. This requires a system for flagging significant changes and ignoring insignificant ones, but we need to define significance. To start, we test a method called changepoint detection, first on global trends, then on local patterns. 
 
 Below we define leisure as visits to restaurants and bars, and see that there are distinct changes in the flow between March and April using a technique called change point detection. The model does not seem to settle on change points in situations with little change; grocers saw much less change than restaurants and the change points are far less clear, appearing in pairs at each hinge. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/changepoints.png)
 
-From here, we can fit a similar model to each neighborhood based on the food traffic to that region. We do this by aggregating visits to every point of interest within a given boundary. This means that we are measuring visits to points of interest, not general activity on the streets and in the residences of a neighborhood. Rather than simply flag the change points across time and space, we can instead pull from the model the rate change at regular intervals throughout the period; these changes, rates being the rates of visits, then show the volatility of mobility patterns across time.   
+From here, we can fit a similar model to each neighborhood based on the food traffic to that region. We do this by aggregating visits to every point of interest within a given boundary. This means that we are measuring visits to points of interest, not general activity on the streets and in the residences of a neighborhood. Rather than simply show the change points across time and space, we can instead show the rate change at regular intervals throughout the period; these changes, rates being the rates of visits, then show the volatility of mobility patterns across time. Thus, the strength of change mapped below can be thought of as an index of volatility.    
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/tracker.gif)
 
