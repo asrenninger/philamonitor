@@ -5,30 +5,32 @@ As the coronavirus spread in Philadelphia this year, travel patterns
 throughout the city changed. With this shock to human mobility came one
 to business activity, as many areas saw reliable patrons forced to stay
 home—especially during the shelter-in-place order which began in March
-and continued into May. This analysis will focus primarily on night
-life—the restaurants and bars that both provide jobs and support vibrant
-streets—but we also monitor certain bellwether industries, like those
-with office work, that doubtless provide a foundation for such night
-life.
+and continued into May. In order to understand the consequences of these
+changes for business viability, we use mobile phone data to explore the
+changing nature commercial demand in Philadelphia. This analysis will
+focus primarily on night life—the restaurants and bars that both provide
+jobs and support vibrant streets—but we also monitor certain bellwether
+industries, like those with office work, that doubtless provide a
+foundation for such night life.
 
 With the goal of understanding the time-space patterns of resident
-movement in Philadelphia, the following section presents mobile phone
-data from SafeGraph, a provider of such records. Note that SafeGraph
-monitors a representative sample (30%) of the population across the
-country, so the values shown below are not the true number of visits or
-journeys, but a slice; that said, we can reduce noise through various
-aggregations and by tracking trends, which are naturally indexed to
-population of devices rather than the population as a whole. We use
-definitions specified in the following infographic: the number of
-**visitors** is the count of devices flowing to a point of interest—be
-it from a given Census Block Group or total—while a **connection** is an
-origin-destination line between a Census Block Group and a point of
-interest, regardless of its weight. We use both here to determine how
-many people are moving about the city and from where to where, which
-calls to how integrated the city is during the pandemic. If one
-neighborhood is driving business along a corridor or at a veneue, it may
-obscure the fact that diversity of clientele—captured in the number of
-unique neighborhoods sending visitors there—is falling.
+movement in Philadelphia, the following section presents data from
+SafeGraph, a provider of such records. Note that SafeGraph monitors a
+representative sample (30%) of the population across the country, so the
+values shown below are not the true number of visits or journeys, but a
+slice; that said, we can reduce noise through various aggregations and
+by tracking trends, which are naturally indexed to population of devices
+rather than the population as a whole. We use definitions specified in
+the following infographic: the number of **visitors** is the count of
+devices flowing to a point of interest—be it from a given Census Block
+Group or total—while a **connection** is an origin-destination line
+between a Census Block Group and a point of interest, regardless of its
+weight. We use both here to determine how many people are moving about
+the city and from where to where, which calls to how integrated the city
+is during the pandemic. If one neighborhood is driving business along a
+corridor or at a veneue, it may obscure the fact that diversity of
+clientele—captured in the number of unique neighborhoods sending
+visitors there—is falling.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/infographic.gif)
 
@@ -63,10 +65,12 @@ interest by its description, which SafeGraph provides. If that
 description contains “restuarant” or “bar”, we call that leisure.
 Anything educational, from tutoring to public, private or charter
 schools to tertiary education, we call that education. Tourism includes
-museums and parks.
+museums and parks. We can see that most businesses agglomerate in Center
+City or nearby, suggesting that there is feedback loop, but no
+businesses cluster more than restaurants and bars.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
-We can also show how visitation is change across time by tracking visits
+We also see how visitation is changing across time by tracking visits
 across brands. The table below shows that brands associated with
 necessities (Target and Walmart) are growing in popularily, along with
 fast food restaurants, which one might expect in a time of constrained
