@@ -229,6 +229,41 @@ beginning in April.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/market.png)
 
+Relationships
+-------------
+
+Changing mobility may influence or exacerbate existing problems in
+Philadelphia, notably around equity and integration. Philadelphia still
+shows patterns of concentrated poverty, segregated housing and isolated
+pockets of prosperty; the pandemic could produce deeper disparities. One
+risk is that communities of color and low income neighborhoods will not
+be able to socially distance in the same capacity as affluent
+communities. The data, however, do not give a clear signal. Below we
+plot the relationship between inflows—individuals visiting points of
+interest in a given tract—and two key predictors: tract income and the
+percentage of the tract that is African American.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/inxblack.png)
+
+The pandemic appears to have flattened an existing relationship between
+race and mobility: in early days of the pandemic, communities of color
+were more likely to receive visitors from the rest of the city, a
+pattern that held for peak months of spread, but this relationship
+weakens as more predominately white communities gained visitors in July
+and August. When we plot the same travel patterns against income, we see
+that wealthy communites are well below their baseline visits, perhaps
+because many of the restaurant clusters are in relatively affluent
+areas. While poor communites are more likely to have recovered to
+baseline but some of the poorest areas are still lagging behind, more in
+line with wealthy ones.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/inxincome.png)
+
+The story is similar when we look at outflows, which we document in the
+appendix. This suggests that poor and minority areas have remained
+comparable active during the pandemic, which may come with heightened
+exposure alongside economic stability.
+
 Anomaly Detection (WIP)
 -----------------------
 
@@ -285,6 +320,10 @@ Appendix
 </tr>
 </tbody>
 </table>
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/outxblack.png)
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/outxincome.png)
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/volatility.png)
 
