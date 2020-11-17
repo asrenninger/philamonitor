@@ -109,12 +109,16 @@ shutdown <-
 
 ##
 
+pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
+
+##
+
 spark <- function(df){
   
   sparkline <- 
     ggplot(data = df, 
            aes(x = week, y = visits)) +
-    geom_line(colour = rev(pal[1:9])[df$decile[1]], size = 10) +
+    geom_line(colour = pal[df$decile[1]], size = 10) +
     geom_vline(xintercept = shutdown$start, size = 5, linetype = 2) +
     geom_vline(xintercept = shutdown$end, size = 5, linetype = 2) +
     theme_void()
@@ -141,13 +145,13 @@ top10 <-
          recent = last(visits)) %>%
   select(-visits) %>%
   mutate_if(is.numeric, round) %>%
-  mutate(change = (recent - highest) / highest) %>%
+  mutate(change = ((recent - highest) / highest) * 100) %>%
   slice(1) %>%
   ungroup() %>%
   left_join(plots) %>%
   arrange(desc(change)) %>%
   drop_na(neighborhood) %>%
-  slice(1:20)
+  slice(1:10)
 
 top10_plots <- select(top10, neighborhood, plot)
 top10 <- select(top10, neighborhood, highest, lowest, recent, change)
@@ -161,12 +165,12 @@ bot10 <-
          recent = last(visits)) %>%
   select(-visits) %>%
   mutate_if(is.numeric, round) %>%
-  mutate(change = (recent - highest) / highest) %>%
+  mutate(change = ((recent - highest) / highest) * 100) %>%
   slice(1) %>%
   ungroup() %>%
   left_join(plots) %>%
   arrange(change) %>%
-  slice(1:20)
+  slice(1:10)
 
 bot10_plots <- select(bot10, neighborhood, plot)
 bot10 <- select(bot10, neighborhood, highest, lowest, recent, change)
@@ -177,19 +181,17 @@ library(gt)
 
 ##
 
-pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
-
-##
-
 bot10 %>% 
   mutate(ggplot = NA) %>% 
+  rename(`% change` = change,
+         `this month` = recent) %>%
   gt() %>% 
   tab_header(title = html("<b>Average Daily Visitors by Week</b>"),
-             subtitle = md("Highest, lowest, and most recent footfall in Philadelphia<br><br>")) %>%
-  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent"))  %>% 
+             subtitle = md("Highest, lowest, and most recent foot traffic in Philadelphia<br><br>")) %>%
+  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Vertical lines indicate the start and end of shelter-in-place"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
             locations = cells_column_labels(vars(`neighborhood`))) %>% 
-  data_color(columns = vars(`change`),
+  data_color(columns = vars(`% change`),
              colors = scales::col_numeric(c(pal), domain = NULL)) %>% 
   cols_align(align = "center",
              columns = 2:5) %>% 
@@ -209,13 +211,15 @@ bot10 %>%
 
 top10 %>% 
   mutate(ggplot = NA) %>% 
+  rename(`% change` = change,
+         `this month` = recent) %>%
   gt() %>% 
   tab_header(title = html("<b>Average Daily Visitors by Week</b>"),
-             subtitle = md("Highest, lowest, and most recent footfall in Philadelphia<br><br>")) %>%
-  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Change is the percent fall from highest to most recent")) %>% 
+             subtitle = md("Highest, lowest, and most recent foot traffic in Philadelphia<br><br>")) %>%
+  tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Vertical lines indicate the start and end of shelter-in-place")) %>% 
   tab_style(style = list(cell_text(weight = "bold")),
             locations = cells_column_labels(vars(`neighborhood`))) %>% 
-  data_color(columns = vars(`change`),
+  data_color(columns = vars(`% change`),
              colors = scales::col_numeric(c(pal), domain = NULL)) %>% 
   cols_align(align = "center",
              columns = 2:5) %>% 
@@ -391,15 +395,16 @@ change <-
               arrange(change) %>%
               slice(1:10) %>%
               mutate(rank = "worst")) %>%
-  select(-august, -january) %>%
-  rename(`change (january-august)` = change)
+  select(-august, -january) %>% 
+  mutate(change = change * 100) %>%
+  rename(`% change (january-august)` = change) 
 
 gt(data = change, rowname_col = "location_name", groupname_col = "rank") %>%
   tab_header(title = html("<b>Points of Interest: best and worst</b>"),
              subtitle = md("Number of unique visitor origin neighborhoods<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: This is a count of unique desire lines, not total visitors"))  %>% 
   data_color(
-    columns = vars(`change (january-august)`),
+    columns = vars(`% change (january-august)`),
     colors = scales::col_numeric(
       palette = pal,
       domain = NULL
@@ -413,6 +418,57 @@ gt(data = change, rowname_col = "location_name", groupname_col = "rank") %>%
               column_labels.border.bottom.color = "grey",
               column_labels.border.bottom.width= px(1)) %>% 
   gtsave("connections.png", expand = 10)
+
+##
+
+datum <- 
+  moves %>%
+  filter(location_name %in% change$location_name) %>%
+  group_by(safegraph_place_id) %>%
+  summarise(visits = sum(raw_visitor_counts)) %>%
+  left_join(phila) %>%
+  mutate(type = case_when(str_detect(top_category, "Restaurants|Drinking") ~ "leisure",
+                          str_detect(top_category, "Schools|Child") ~ "school",
+                          str_detect(top_category, "Stores") & str_detect(top_category, "Food|Grocery|Liquor") ~ "grocery",
+                          str_detect(top_category, "Stores|Dealers") & !str_detect(top_category, "Food|Grocery|Liquor") ~ "shopping",
+                          str_detect(top_category, "Gasoline Stations|Automotive") ~ "automotive",
+                          str_detect(top_category, "Real estate") ~ "real Estate",
+                          str_detect(top_category, "Museums|Amusement|Accommodation|Sports|Gambling") ~ "tourism", 
+                          str_detect(top_category, "Offices|Outpatient|Nursing|Home Health|Diagnostic") & !str_detect(top_category, "Real Estate") ~ "healthcare",
+                          str_detect(top_category, "Care") & str_detect(top_category, "Personal") ~ "pharmacy",
+                          str_detect(top_category, "Religious") ~ "worship",
+                          TRUE ~ "other")) %>%
+  select(location_name, type, latitude, longitude, visits) %>%
+  st_as_sf(coords = c("longitude", "latitude"), remove = FALSE, crs = 4326) %>%
+  st_transform(3702)
+
+##
+
+datum <-
+  datum %>%
+  st_coordinates() %>%
+  as_tibble() %>%
+  bind_cols(datum) %>% 
+  select(-geometry)
+
+##
+
+anim <- 
+  ggplot() +
+  geom_sf(data = background, 
+          aes(), fill = NA, colour = '#000000', lwd = 0.5) +
+  geom_point(data = datum, aes(x = X, y = Y, size = visits, colour = type), alpha = 0.5) +
+  scale_size_continuous(range = c(1, 8)) +
+  scale_colour_manual(values = c('#000000', pal),
+                      guide = 'none') + 
+  labs(title = "Points of Interest", subtitle = "{current_frame}") +
+  transition_manual(location_name) +
+  ease_aes() + 
+  theme_map() +
+  theme(legend.position = 'bottom')
+
+anim_save("businesses.gif", animation = anim, 
+          height = 800, width = 600, fps = 1)
 
 ##
 

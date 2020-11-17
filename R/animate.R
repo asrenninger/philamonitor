@@ -167,12 +167,29 @@ ranks <-
   arrange(week, -visits) %>%
   mutate(rank = 1:n()) %>%
   ungroup() %>%
-  filter(rank <= 10) %>%
+  filter(rank <= 20) %>%
   as_tibble()
+
+shutdown <- 
+  read_csv("https://raw.githubusercontent.com/Keystone-Strategy/covid19-intervention-data/master/complete_npis_inherited_policies.csv") %>% 
+  filter(state == "Pennsylvania" & npi == "closing_of_public_venues" & county == "Philadelphia") %>%
+  drop_na(start_date) %>%
+  transmute(start_date = as_date(start_date, format = '%m/%d/%Y'),
+            end_date = as_date(end_date, format = '%m/%d/%Y')) %>%
+  mutate(start = week(start_date),
+         end = week(end_date))
+
+shutdown <- 
+  tibble(week = unique(ranks$week),
+         indicator = case_when(week >= shutdown$start & week <= shutdown$end ~ "LOCKDOWN",
+                               TRUE ~ ""))
+
+##
 
 base <- 
   ggplot(ranks %>%
-           mutate(location_name = str_replace_all(location_name, pattern = " \\(.*?\\)", replacement = ""))) +  
+           mutate(location_name = str_replace_all(location_name, pattern = " \\(.*?\\)", replacement = "")) %>%
+           left_join(shutdown)) +  
   aes(xmin = 0 ,  
       xmax = visits) +  
   aes(ymin = rank - .45,  
@@ -187,14 +204,18 @@ base <-
   labs(fill = NULL) +  
   labs(x = 'activity (visits)') +  
   labs(y = "") +
+  labs(title = "Brand Popularity", subtitle = "Changes throughout the pandemic") +
   theme_rot() +
   theme(axis.text.y = element_blank())
 
 anim <- 
   base +
-  geom_text(x = 800 , y = -10, hjust = 1, 
+  geom_text(x = 800 , y = -20, hjust = 1, 
             aes(label = paste("week", week, sep = " ")),
             size = 20, col = '#6e6e6e') +
+  geom_text(x = 800, y = -18, hjust = 1,
+            aes(label = indicator), 
+            size = 15, col = pal[1]) +
   aes(group = location_name) +
   transition_time(week) +
   ease_aes("cubic-in-out")

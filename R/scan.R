@@ -132,7 +132,7 @@ background <-
 
 grid <- 
   background %>% 
-  st_make_grid(cellsize = 250) %>% 
+  st_make_grid(cellsize = 500) %>% 
   as_tibble() %>%
   rownames_to_column() %>%
   rename(id = rowname) %>%
@@ -189,18 +189,6 @@ ggplot(joint) +
 
 ##
 
-phila %>%
-  left_join(cross) %>%
-  filter(class == "leisure") %>%
-  mutate(cluster = clusters$cluster) %>%
-  filter(cluster != 0) %>%
-  group_by(cluster) %>%
-  summarise() %>%
-  mutate(geometry = st_convex_hull(geometry)) %>%
-  plot()
-
-##
-
 library(furrr)
 future::plan(multiprocess)
 
@@ -220,6 +208,35 @@ fixed <-
              visits = value)
   })) %>%
   unnest(cols = c(visits_by_day))
+
+##
+
+cross <- 
+  phila %>%
+  st_drop_geometry() %>%
+  mutate(class = case_when(str_detect(top_category, "Restaurants|Drinking") ~ "leisure",
+                           str_detect(top_category, "Schools|Child") ~ "school",
+                           str_detect(top_category, "Stores") & str_detect(top_category, "Food|Grocery|Liquor") ~ "grocery",
+                           str_detect(top_category, "Stores|Dealers") & !str_detect(top_category, "Food|Grocery|Liquor") ~ "shopping",
+                           str_detect(top_category, "Gasoline Stations|Automotive") ~ "automotive",
+                           str_detect(top_category, "Real Estate") ~ "real Estate",
+                           str_detect(top_category, "Museums|Amusement|Accommodation|Sports|Gambling") ~ "tourism", 
+                           str_detect(top_category, "Offices|Outpatient|Nursing|Home Health|Diagnostic") & !str_detect(top_category, "Real Estate") ~ "healthcare",
+                           str_detect(top_category, "Care") & str_detect(top_category, "Personal") ~ "pharmacy",
+                           str_detect(top_category, "Religious") ~ "worship",
+                           TRUE ~ "other")) %>%
+  distinct(top_category, .keep_all = TRUE) %>%
+  select(top_category, class)
+
+leisure <- 
+  phila %>%
+  left_join(cross) %>%
+  filter(class == "leisure")
+
+clusters <- dbscan(leisure %>%
+                     st_transform(3857) %>%
+                     st_coordinates() %>% 
+                     as_tibble(), eps = 250, minPts = 5, weights = NULL, borderPoints = TRUE)
 
 ##
 
@@ -271,6 +288,10 @@ shutdown <-
             end_date = as_date(end_date, format = '%m/%d/%Y')) %>%
   mutate(start = week(start_date),
          end = week(end_date))
+
+##
+
+pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
 
 ##
 
@@ -333,13 +354,13 @@ top10 <-
   summarise(high = max(visits),
             low = min(visits),
             average = mean(visits)) %>%
-  mutate(change = (low - high) / high) %>%
+  mutate(change = ((low - high) / high) * 100) %>%
   filter(high > 500) %>%
   left_join(maps) %>%
   left_join(plots) %>%
   select(map, cluster, high, low, average, change, plot) %>%
   arrange(desc(change)) %>%
-  slice(1:20)
+  slice(1:10)
 
 top10_plots <- select(top10, cluster, plot, map)
 top10 <- select(top10, cluster, high, low, average, change)
@@ -350,13 +371,13 @@ bot10 <-
   summarise(high = max(visits),
             low = min(visits),
             average = mean(visits)) %>%
-  mutate(change = (low - high) / high) %>%
+  mutate(change = ((low - high) / high) * 100) %>%
   filter(high > 500) %>%
   left_join(maps) %>%
   left_join(plots) %>%
   select(map, cluster, high, low, average, change, plot) %>%
   arrange(change) %>%
-  slice(1:20)
+  slice(1:10)
 
 bot10_plots <- select(bot10, cluster, plot, map)
 bot10 <- select(bot10, cluster, high, low, average, change)
@@ -367,15 +388,12 @@ library(gt)
 
 ##
 
-pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
-
-##
-
 bot10 %>% 
   mutate(ggplot = NA, ggmap = NA) %>%
   select(ggmap, cluster, high, low, average, change, ggplot) %>%
+  rename(`% change` = change) %>%
   gt() %>% 
-  tab_header(title = html("<b>Nigh Life Hubs: bottom twenty</b>"),
+  tab_header(title = html("<b>Nigh Life Hubs: bottom ten</b>"),
              subtitle = md("Weekly visits to various economic clusters<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Period spanning January to August 2020"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
@@ -383,7 +401,7 @@ bot10 %>%
   cols_label(ggmap = "") %>% 
   text_transform(locations = cells_body(columns = vars(`ggmap`)),
                  fn = function(x) {map(bot10_plots$map, ggplot_image, height = px(30), aspect_ratio = 1)}) %>%
-  data_color(columns = vars(`change`),
+  data_color(columns = vars(`% change`),
              colors = scales::col_numeric(c(pal), domain = NULL)) %>% 
   cols_align(align = "center",
              columns = 2:5) %>% 
@@ -404,8 +422,9 @@ bot10 %>%
 top10 %>% 
   mutate(ggplot = NA, ggmap = NA) %>%
   select(ggmap, cluster, high, low, average, change, ggplot) %>%
+  rename(`% change` = change) %>%
   gt() %>% 
-  tab_header(title = html("<b>Nigh Life Hubs: top twenty</b>"),
+  tab_header(title = html("<b>Nigh Life Hubs: top ten</b>"),
              subtitle = md("Weekly visits to various economic clusters<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Period spanning January to August 2020"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
@@ -413,7 +432,7 @@ top10 %>%
   cols_label(ggmap = "") %>% 
   text_transform(locations = cells_body(columns = vars(`ggmap`)),
                  fn = function(x) {map(top10_plots$map, ggplot_image, height = px(30), aspect_ratio = 1)}) %>%
-  data_color(columns = vars(`change`),
+  data_color(columns = vars(`% change`),
              colors = scales::col_numeric(c(pal), domain = NULL)) %>% 
   cols_align(align = "center",
              columns = 2:5) %>% 
@@ -433,3 +452,64 @@ top10 %>%
 
 ##
 
+centroid <- 
+  phila %>% 
+  filter(str_detect(location_name, "City Hall")) %>% 
+  st_transform(3702) %>% 
+  st_coordinates() %>% 
+  as_tibble()
+
+location <- 
+  coord %>%
+  st_coordinates() %>% 
+  as_tibble()
+
+library(spdep)
+library(FNN)
+
+nn <- get.knnx(centroid, location, k = 1)
+
+distance <- 
+  phila %>%
+  left_join(cross) %>%
+  filter(class == "leisure") %>%
+  mutate(cluster = clusters$cluster) %>%
+  group_by(cluster) %>%
+  summarise() %>%
+  st_drop_geometry() %>% 
+  mutate(distance =  nn$nn.dist[, 1])
+
+joined <- 
+  ready %>%
+  group_by(cluster) %>%
+  summarise(high = max(visits),
+            low = min(visits),
+            average = mean(visits)) %>%
+  mutate(change = ((low - high) / high) * 100) %>%
+  left_join(distance) %>%
+  mutate(percentile = ntile(average, 100)) %>%
+  filter(percentile < 96 & percentile > 4)
+
+p1 <- 
+  ggplot(joined, aes(distance, average)) +
+  geom_point(colour = pal[7]) + 
+  geom_smooth(method = lm, se = FALSE, colour = pal[9]) +
+  ylab("average visits") +
+  xlab("distance to city hall") +
+  theme_ver()
+
+p2 <- 
+  ggplot(joined, aes(distance, change)) +
+  geom_point(colour = pal[7]) + 
+  geom_smooth(method = lm, se = FALSE, colour = pal[9]) +
+  ylab("% change in visits") +
+  xlab("distance to city hall") +
+  theme_ver()
+
+library(patchwork)  
+
+theme_hor
+
+p <- p1 + p2 & plot_annotation(title = "Activity and Location", subtitle = "The relationship between distance to City Hall and visits") & theme_ver()
+
+ggsave(p, filename = "relationships.png", height = 4, width = 8)  
