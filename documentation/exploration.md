@@ -72,9 +72,9 @@ businesses cluster more than restaurants and bars.
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
 We also see how visitation is changing across time by tracking visits
 across brands. The table below shows that brands associated with
-necessities (Target and Walmart) are see comparably less of a decline
-than others, along with fast food restaurants, which one might expect in
-a time of constrained budgets. The map explores pairs of like brands and
+necessities (Target and Walmart) saw comparably less of a decline than
+others, along with fast food restaurants, which one might expect in a
+time of constrained budgets. The map explores pairs of like brands and
 their locations in Philadelphia.
 
 <table>

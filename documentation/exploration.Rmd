@@ -34,7 +34,7 @@ This analysis comprises different scales, each elaborating on distinct aspects o
 In this section, we look at trends across the city, beginning with the distribution of venues and businesses. We classify each point of interest by its description, which SafeGraph provides. If that description contains "restuarant" or "bar", we call that leisure. Anything educational, from tutoring to public, private or charter schools to tertiary education, we call that education. Tourism includes museums and parks. We can see that most businesses agglomerate in Center City or nearby, suggesting that there is feedback loop, but no businesses cluster more than restaurants and bars. 
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
-We also see how visitation is changing across time by tracking visits across brands. The table below shows that brands associated with necessities (Target and Walmart) are see comparably less of a decline than others, along with fast food restaurants, which one might expect in a time of constrained budgets. The map explores pairs of like brands and their locations in Philadelphia.
+We also see how visitation is changing across time by tracking visits across brands. The table below shows that brands associated with necessities (Target and Walmart) saw comparably less of a decline than others, along with fast food restaurants, which one might expect in a time of constrained budgets. The map explores pairs of like brands and their locations in Philadelphia.
 
  Rankings             |  Locations
 :-------------------------:|:-------------------------:
