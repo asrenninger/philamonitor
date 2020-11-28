@@ -228,55 +228,46 @@ cross <-
   distinct(top_category, .keep_all = TRUE) %>%
   select(top_category, class)
 
-leisure <- 
-  phila %>%
-  left_join(cross) %>%
-  filter(class == "leisure")
+##
 
-clusters <- dbscan(leisure %>%
-                     st_transform(3857) %>%
-                     st_coordinates() %>% 
-                     as_tibble(), eps = 250, minPts = 5, weights = NULL, borderPoints = TRUE)
+corridors <- read_sf("http://data.phl.opendata.arcgis.com/datasets/f43e5f92d34e41249e7a11f269792d11_0.geojson") %>%
+  clean_names() %>%
+  transmute(corridor = name, 
+            vacancy = str_remove_all(vac_rate, "[^0-9.]"),
+            location = p_dist) %>%
+  mutate(vacancy = as.numeric(vacancy)) %>%
+  st_transform(3702)
+
+plot(corridors)
 
 ##
 
 leisure <- 
-  phila %>%
-  st_drop_geometry() %>%
+  phila %>% 
   left_join(cross) %>%
   filter(class == "leisure") %>%
-  mutate(cluster = clusters$cluster) %>%
-  select(safegraph_place_id, cluster)
+  st_transform(3702) %>%
+  st_join(corridors) %>%
+  select(safegraph_place_id, corridor, vacancy, location)
 
 ready <- 
   fixed %>%
   filter(safegraph_place_id %in% leisure$safegraph_place_id) %>%
-  left_join(leisure) %>%
-  filter(cluster != 0) %>%
+  left_join(st_drop_geometry(leisure)) %>%
+  drop_na(corridor) %>%
   mutate(date = glue("2020-{month(date_range_start)}-{day}"),
          visits = as.numeric(visits)) %>%
   mutate(date = as_date(date)) %>%
   mutate(week = week(date)) %>%
-  group_by(cluster, week) %>%
-  summarise(visits = sum(visits)) %>%
-  ungroup()
+  group_by(corridor, week) %>%
+  summarise(visits = sum(visits), n = n()) %>%
+  ungroup() 
 
 ##
 
-coord <-
-  phila %>%
-  left_join(cross) %>%
-  filter(class == "leisure") %>%
-  mutate(cluster = clusters$cluster) %>%
-  group_by(cluster) %>%
-  summarise() %>%
-  mutate(geometry = st_convex_hull(geometry)) %>%
-  st_centroid() %>%
-  st_transform(3702)
-
-dizzy <- 
-  background %>% 
-  st_transform(3702)
+coord <- st_centroid(corridors)
+  
+dizzy <- st_transform(background, 3702)
 
 ##
 
@@ -300,7 +291,7 @@ mapit <- function(id){
   locater <-
     ggplot() +
     geom_point(data = coord %>% 
-                 filter(cluster == id) %>%
+                 filter(corridor == id) %>%
                  st_coordinates() %>%
                  as_tibble(), 
                aes(x = X, y = Y), 
@@ -330,27 +321,27 @@ spark <- function(df){
 
 plots <- 
   ready %>%
-  select(cluster, week, visits) %>%
-  group_by(cluster) %>%
+  select(corridor, week, visits) %>%
+  group_by(corridor) %>%
   mutate(change = (min(visits) - max(visits)) / max(visits)) %>%
   ungroup() %>%
   mutate(decile = ntile(change, 9)) %>%
   select(-change) %>%
-  group_by(cluster) %>%
+  group_by(corridor) %>%
   nest() %>%
   mutate(plot = map(data, spark)) %>%
   select(-data)
 
 maps <- 
   ready %>%
-  distinct(cluster) %>%
-  mutate(map = map(cluster, mapit))
+  distinct(corridor) %>%
+  mutate(map = map(corridor, mapit))
 
 ##
 
 top10 <-
   ready %>%
-  group_by(cluster) %>%
+  group_by(corridor) %>%
   summarise(high = max(visits),
             low = min(visits),
             average = mean(visits)) %>%
@@ -358,16 +349,16 @@ top10 <-
   filter(high > 500) %>%
   left_join(maps) %>%
   left_join(plots) %>%
-  select(map, cluster, high, low, average, change, plot) %>%
+  select(map, corridor, high, low, average, change, plot) %>%
   arrange(desc(change)) %>%
-  slice(1:10)
+  slice(1:20)
 
-top10_plots <- select(top10, cluster, plot, map)
-top10 <- select(top10, cluster, high, low, average, change)
+top10_plots <- select(top10, corridor, plot, map)
+top10 <- select(top10, corridor, high, low, average, change)
 
 bot10 <-
   ready %>%
-  group_by(cluster) %>%
+  group_by(corridor) %>%
   summarise(high = max(visits),
             low = min(visits),
             average = mean(visits)) %>%
@@ -375,12 +366,12 @@ bot10 <-
   filter(high > 500) %>%
   left_join(maps) %>%
   left_join(plots) %>%
-  select(map, cluster, high, low, average, change, plot) %>%
+  select(map, corridor, high, low, average, change, plot) %>%
   arrange(change) %>%
-  slice(1:10)
+  slice(1:20)
 
-bot10_plots <- select(bot10, cluster, plot, map)
-bot10 <- select(bot10, cluster, high, low, average, change)
+bot10_plots <- select(bot10, corridor, plot, map)
+bot10 <- select(bot10, corridor, high, low, average, change)
 
 ##
 
@@ -390,14 +381,14 @@ library(gt)
 
 bot10 %>% 
   mutate(ggplot = NA, ggmap = NA) %>%
-  select(ggmap, cluster, high, low, average, change, ggplot) %>%
+  select(ggmap, corridor, high, low, average, change, ggplot) %>%
   rename(`% change` = change) %>%
   gt() %>% 
-  tab_header(title = html("<b>Nigh Life Hubs: bottom ten</b>"),
+  tab_header(title = html("<b>Nigh Life Hubs: bottom twenty</b>"),
              subtitle = md("Weekly visits to various economic clusters<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Period spanning January to August 2020"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
-            locations = cells_column_labels(vars(`cluster`))) %>% 
+            locations = cells_column_labels(vars(`corridor`))) %>% 
   cols_label(ggmap = "") %>% 
   text_transform(locations = cells_body(columns = vars(`ggmap`)),
                  fn = function(x) {map(bot10_plots$map, ggplot_image, height = px(30), aspect_ratio = 1)}) %>%
@@ -421,14 +412,14 @@ bot10 %>%
 
 top10 %>% 
   mutate(ggplot = NA, ggmap = NA) %>%
-  select(ggmap, cluster, high, low, average, change, ggplot) %>%
+  select(ggmap, corridor, high, low, average, change, ggplot) %>%
   rename(`% change` = change) %>%
   gt() %>% 
-  tab_header(title = html("<b>Nigh Life Hubs: top ten</b>"),
+  tab_header(title = html("<b>Nigh Life Hubs: top twenty</b>"),
              subtitle = md("Weekly visits to various economic clusters<br><br>")) %>%
   tab_source_note(source_note = md("**Data**: SafeGraph | **Note**: Period spanning January to August 2020"))  %>% 
   tab_style(style = list(cell_text(weight = "bold")),
-            locations = cells_column_labels(vars(`cluster`))) %>% 
+            locations = cells_column_labels(vars(`corridor`))) %>% 
   cols_label(ggmap = "") %>% 
   text_transform(locations = cells_body(columns = vars(`ggmap`)),
                  fn = function(x) {map(top10_plots$map, ggplot_image, height = px(30), aspect_ratio = 1)}) %>%
@@ -452,6 +443,39 @@ top10 %>%
 
 ##
 
+ggplot(ready %>%
+         group_by(corridor) %>%
+         summarise(high = max(visits),
+                   low = min(visits),
+                   average = mean(visits)) %>%
+         mutate(change = ((low - high) / high) * 100) %>%
+         left_join(corridors) %>%
+         st_as_sf()) +
+  geom_sf(data = background, 
+          aes(), fill = NA, colour = '#000000', lwd = 1) +
+  geom_sf(aes(fill = factor(ntile(average, 9))), 
+          lwd = 0,
+          colour = NA) +
+  coord_sf(crs = 3702) +
+  scale_fill_manual(values = pal,
+                    labels = as.character(round(quantile(ready %>%
+                                                           group_by(corridor) %>%
+                                                           summarise(high = max(visits),
+                                                                     low = min(visits),
+                                                                     average = mean(visits)) %>%
+                                                           mutate(change = ((low - high) / high) * 100)  %>%
+                                                           pull(average),
+                                                         c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+                                                         na.rm = TRUE))),
+                    name = "visits",
+                    guide = guide_discrete) +
+  labs(title = 'Leisure Corridors', subtitle = "Clusters of restaurants and bars") +
+  theme_map() +
+  theme(legend.position = 'bottom') +
+  ggsave("corridors.png", height = 12, width = 14, dpi = 300)
+
+##
+
 centroid <- 
   phila %>% 
   filter(str_detect(location_name, "City Hall")) %>% 
@@ -464,24 +488,26 @@ location <-
   st_coordinates() %>% 
   as_tibble()
 
+##
+
 library(spdep)
 library(FNN)
 
+##
+
 nn <- get.knnx(centroid, location, k = 1)
 
+##
+
 distance <- 
-  phila %>%
-  left_join(cross) %>%
-  filter(class == "leisure") %>%
-  mutate(cluster = clusters$cluster) %>%
-  group_by(cluster) %>%
-  summarise() %>%
+  coord %>% 
   st_drop_geometry() %>% 
-  mutate(distance =  nn$nn.dist[, 1])
+  mutate(distance = nn$nn.dist[, 1]) %>%
+  select(corridor, distance)
 
 joined <- 
   ready %>%
-  group_by(cluster) %>%
+  group_by(corridor) %>%
   summarise(high = max(visits),
             low = min(visits),
             average = mean(visits)) %>%
@@ -506,10 +532,42 @@ p2 <-
   xlab("distance to city hall") +
   theme_ver()
 
+##
+
 library(patchwork)  
 
-theme_hor
+##
 
-p <- p1 + p2 & plot_annotation(title = "Activity and Location", subtitle = "The relationship between distance to City Hall and visits") & theme_ver()
+p <- p1 + p2 & plot_annotation(title = "Corridor Activity", subtitle = "The relationship between distance to City Hall and visits") & theme_ver()
 
 ggsave(p, filename = "relationships.png", height = 4, width = 8)  
+
+##
+
+joined <- 
+  ready %>%
+  left_join(distance) %>%
+  mutate(percentile = ntile(visits, 100)) %>%
+  filter(percentile < 96 & percentile > 4)
+
+##
+
+library(gganimate)
+
+##
+
+anim <- 
+  ggplot(joined, aes(distance, visits)) +
+  geom_point(colour = pal[7]) + 
+  geom_smooth(method = lm, se = FALSE, colour = pal[9]) +
+  ylab("average visits") +
+  xlab("distance to city hall") +
+  labs(title = "Activity-Centrality Relationship", subtitle = "Week {current_frame}") + 
+  transition_manual(week) +
+  ease_aes() + 
+  theme_ver() 
+
+anim_save("relationships.gif", animation = anim, 
+          height = 600, width = 800, fps = 2)
+
+

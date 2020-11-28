@@ -156,13 +156,16 @@ sums <-
   long %>%
   lazy_dt() %>%
   group_by(location_name, week) %>%
-  summarise(visits = n()) %>%
+  summarise(visits = sum(visits_by_day), 
+            n = n()) %>%
   ungroup() %>%
   as_tibble()
 
 ranks <- 
   sums %>%
   lazy_dt() %>%
+  filter(!str_detect(location_name, "University of Pennsylvania|Airport")) %>%
+  filter(n > 70) %>% 
   group_by(week) %>%
   arrange(week, -visits) %>%
   mutate(rank = 1:n()) %>%
@@ -210,19 +213,19 @@ base <-
 
 anim <- 
   base +
-  geom_text(x = 800 , y = -20, hjust = 1, 
+  geom_text(x = 15000 , y = -20, hjust = 1, 
             aes(label = paste("week", week, sep = " ")),
             size = 20, col = '#6e6e6e') +
-  geom_text(x = 800, y = -18, hjust = 1,
+  geom_text(x = 15000, y = -18, hjust = 1,
             aes(label = indicator), 
             size = 15, col = pal[1]) +
   aes(group = location_name) +
   transition_time(week) +
-  ease_aes("cubic-in-out")
+  ease_aes("sine-in-out")
   
 anim_save("bars.gif", animation = anim, 
-          height = 800, width = 800, fps = 5,
-          start_pause = 2, end_pause = 2)
+          height = 800, width = 800, fps = 1,
+          start_pause = 2, end_pause = 2) 
 
 ##
 
@@ -238,5 +241,4 @@ list.files(path = 'miscellany/animations/complete', pattern = "*.png", full.name
   image_animate(fps = 1) %>% 
   image_write(glue("blues.gif"))
 
-##
   
