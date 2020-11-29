@@ -41,6 +41,19 @@ the impact of the pandemic on urban life in Philadelphia.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/flows.gif)
 
+Each visit involves a mobile device entering into a point of interest;
+these include parks and museums, restaurats and bars, or offices and
+hospitals. Below we map the distribution of these venues and businesses
+for context. We classify each point of interest by its description,
+which SafeGraph provides. If that description contains “restuarant” or
+“bar”, we call that leisure. Anything educational, from tutoring to
+public, private or charter schools to tertiary education, we call that
+education. Tourism includes museums and parks. We can see that most
+businesses agglomerate in Center City or nearby but no businesses
+cluster more than restaurants and bars.
+
+![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
+
 This analysis comprises different scales, each elaborating on distinct
 aspects of mobility and activity in Philadelphia. We can look
 *globally*, across the city, to explore trends throughout; we can also
@@ -59,23 +72,17 @@ them at each scale.
 global
 ------
 
-In this section, we look at trends across the city, beginning with the
-distribution of venues and businesses. We classify each point of
-interest by its description, which SafeGraph provides. If that
-description contains “restuarant” or “bar”, we call that leisure.
-Anything educational, from tutoring to public, private or charter
-schools to tertiary education, we call that education. Tourism includes
-museums and parks. We can see that most businesses agglomerate in Center
-City or nearby, suggesting that there is feedback loop, but no
-businesses cluster more than restaurants and bars.
-
-![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/split.png)
-We also see how visitation is changing across time by tracking visits
-across brands. The table below shows that brands associated with
-necessities (Target and Walmart) saw comparably less of a decline than
-others, along with fast food restaurants, which one might expect in a
-time of constrained budgets. The map explores pairs of like brands and
-their locations in Philadelphia.
+In this section we explore trends and relationships manifest most
+strongly at the global level, across the city. Best described by this
+focus on the whole over its part are how certain brands and industries
+are performing, regardless of location, and how certain variables
+predict changes to activity and mobility in Philadelphia. We see how
+visitation is changing across time by tracking visits across brands. The
+table below shows that brands associated with necessities (Target and
+Walmart) saw comparably less of a decline than others, along with fast
+food restaurants, which one might expect in a time of constrained
+budgets. The map explores pairs of like brands and their locations in
+Philadelphia.
 
 <table>
 <thead>
@@ -151,8 +158,10 @@ local
 -----
 
 Perhaps more valuable than probing individual points of interest is
-aggregating by areal units, which we do in this section. Philadelphia
-has roughly 150 neighborhoods (we use
+aggregating by areal units, which we do in this section. These allow us
+to see how visits in particular are changing throughout the pandemic in
+different parts of Philadelphia. Philadelphia has roughly 150
+neighborhoods (we use
 [definitions](https://github.com/azavea/geo-data/tree/master/Neighborhoods_Philadelphia)
 from local firm Azavea) and each responded differently to the pandemic.
 Neighborhoods dominated by office work, like the Navy Yard along with
@@ -235,13 +244,14 @@ poi
 
 Finally, this section looks at individual points of interest, how they
 perform over time and whether or not we can identify certain bellwether
-businesses within the city. We start by looking at the network of
-connections across the city. Drawing a line between each origin
-(neighborhood) and destination (point of interest), there is a dense
-web—a nearly saturated graph where all neighborhoods send visitors to
-all other corners of the city. This web becomes sparser as the pandemic
-came to the fore and there during the late summer there were fewer links
-than during the late winter.
+businesses within the city. These cases can provide further insight into
+how the pandemic is changing mobility. We start by looking at the
+network of connections across the city. Drawing a line between each
+origin (neighborhood) and destination (point of interest), there is a
+dense web—a nearly saturated graph where all neighborhoods send visitors
+to all other corners of the city. This web becomes sparser as the
+pandemic came to the fore and there during the late summer there were
+fewer links than during the late winter.
 
 ![](https://raw.githubusercontent.com/asrenninger/philamonitor/master/viz/flows.png)
 
