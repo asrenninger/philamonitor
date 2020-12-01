@@ -43,7 +43,8 @@ edges <-
   filter(month == 4) %>%
   transmute(from = cbg,
             to = poi_cbg, 
-            weight = visits)
+            weight = visits) %>%
+  filter(from %in% shape$GEOID)
 
 nodes <- 
   shape %>%
@@ -93,6 +94,8 @@ centraliser <-
       graph_from_data_frame(vertices = nodes, directed = TRUE) %>%
       set_edge_attr("weight", value = edges$weight)
     
+    infomap_clusters <- cluster_infomap(graph)
+    
     cents <- 
       tibble(GEOID = V(graph)$name,
              evc = evcent(graph)$vector, 
@@ -100,16 +103,38 @@ centraliser <-
              bet = betweenness(graph, weights = E(graph)$weight, normalized = TRUE), 
              clo = closeness(graph, weights =  E(graph)$weight),
              ecc = eccentricity(graph),
-             prc = page_rank(graph, directed = TRUE, weights = E(graph)$weight)$vector) %>%
+             prc = page_rank(graph, directed = TRUE, weights = E(graph)$weight)$vector,
+             inf = infomap_clusters$membership) %>%
       mutate(month = unique(x$month))
     
     return(cents)
     
-}
+  }
 
 ##
 
 cents <- map_df(ready, centraliser)
+
+##
+
+ggplot() +
+  geom_sf(data = race %>%
+            mutate(percent = 100 * (value / summary_value)), 
+          aes(fill = percent), lwd = 0) + 
+  geom_sf(data = 
+            cents %>%
+            left_join(shape) %>%
+            st_as_sf() %>%
+            group_by(month, inf) %>%
+            summarise(), aes(), lwd = 1, fill = NA) +
+  scale_fill_gradientn(colours = rev(pal), 
+                       guide = guide_continuous) +
+  facet_grid(variable ~ month) +
+  labs(title = "Communities by Month",
+       subtitle = "Detected mobility clusters over demographic compositon") + 
+  theme_map() +
+  theme(legend.position = 'bottom') + 
+  ggsave("communitiesxrace.png", height = 8, width = 11, dpi = 300)
 
 ##
 
