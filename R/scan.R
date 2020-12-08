@@ -447,13 +447,14 @@ ggplot(ready %>%
          group_by(corridor) %>%
          summarise(high = max(visits),
                    low = min(visits),
+                   recent = last(visits),
                    average = mean(visits)) %>%
-         mutate(change = ((low - high) / high) * 100) %>%
+         mutate(change = ((recent - high) / high) * 100) %>%
          left_join(corridors) %>%
          st_as_sf()) +
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 1) +
-  geom_sf(aes(fill = factor(ntile(average, 9))), 
+  geom_sf(aes(fill = factor(ntile(change, 9))), 
           lwd = 0,
           colour = NA) +
   coord_sf(crs = 3702) +
@@ -462,12 +463,13 @@ ggplot(ready %>%
                                                            group_by(corridor) %>%
                                                            summarise(high = max(visits),
                                                                      low = min(visits),
+                                                                     recent = last(visits),
                                                                      average = mean(visits)) %>%
-                                                           mutate(change = ((low - high) / high) * 100)  %>%
-                                                           pull(average),
+                                                           mutate(change = ((recent - high) / high) * 100) %>%
+                                                           pull(change),
                                                          c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
                                                          na.rm = TRUE))),
-                    name = "visits",
+                    name = "% change",
                     guide = guide_discrete) +
   labs(title = 'Leisure Corridors', subtitle = "Clusters of restaurants and bars") +
   theme_map() +

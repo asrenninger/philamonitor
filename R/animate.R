@@ -241,4 +241,4 @@ list.files(path = 'miscellany/animations/complete', pattern = "*.png", full.name
   image_animate(fps = 1) %>% 
   image_write(glue("blues.gif"))
 
-  
+

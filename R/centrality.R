@@ -117,8 +117,15 @@ cents <- map_df(ready, centraliser)
 
 ##
 
+labels <- 
+  odmat %>%
+  mutate(label = lubridate::month(start, label = TRUE, abbr = FALSE)) %>%
+  select(month, label) %>%
+  distinct(month, .keep_all = TRUE)
+
 ggplot() +
   geom_sf(data = race %>%
+            mutate(variable = str_to_title(variable)) %>%
             mutate(percent = 100 * (value / summary_value)), 
           aes(fill = percent), lwd = 0) + 
   geom_sf(data = 
@@ -126,14 +133,16 @@ ggplot() +
             left_join(shape) %>%
             st_as_sf() %>%
             group_by(month, inf) %>%
-            summarise(), aes(), lwd = 1, fill = NA) +
+            summarise() %>%
+            left_join(labels), aes(), lwd = 1, fill = NA) +
   scale_fill_gradientn(colours = rev(pal), 
                        guide = guide_continuous) +
-  facet_grid(variable ~ month) +
+  facet_grid(variable ~ label) +
   labs(title = "Communities by Month",
        subtitle = "Detected mobility clusters over demographic compositon") + 
   theme_map() +
-  theme(legend.position = 'bottom') + 
+  theme(legend.position = 'bottom',
+        strip.text.y = element_text(angle = 270)) + 
   ggsave("communitiesxrace.png", height = 8, width = 11, dpi = 300)
 
 ##

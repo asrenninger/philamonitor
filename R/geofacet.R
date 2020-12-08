@@ -12,6 +12,10 @@ moves <- read_csv("data/processed/moves_monthly.csv") %>% glimpse()
 
 ##
 
+pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
+
+##
+
 hoods <- read_sf("https://raw.githubusercontent.com/azavea/geo-data/master/Neighborhoods_Philadelphia/Neighborhoods_Philadelphia.geojson")
 
 point <- 
@@ -115,7 +119,7 @@ facet <-
             row = dense_rank(-V2)) %>%
   st_drop_geometry()
 
-resuling_hex %>%
+resulting_hex %>%
   transmute(name = name, 
             code = as.character(code),
             col = col,
@@ -123,9 +127,122 @@ resuling_hex %>%
             col2 = dense_rank(V1),
             row2 = dense_rank(-V2)) 
 
-grid_preview(facet)
+grid_preview(filter(facet, name != "Port Richmond"))
 
 resulting_hex %>% select(row) %>% plot()
+
+##
+
+joint <- 
+  moves %>%
+  mutate(visits_by_day = str_remove_all(visits_by_day, pattern = "\\[|\\]"))  %>%
+  separate_rows(visits_by_day, sep = ",") %>%
+  mutate(month = month(date_range_start)) %>%
+  group_by(safegraph_place_id, month) %>%
+  mutate(day = 1:n()) %>%
+  ungroup() %>%
+  mutate(date = glue("2020-{month}-{day}")) %>%
+  select(safegraph_place_id, date, visits_by_day) %>%
+  mutate(visits_by_day = as.numeric(visits_by_day)) %>%
+  left_join(cross) %>%
+  group_by(date, name) %>%
+  summarise(visits = sum(visits_by_day)) %>%
+  ungroup()
+
+joint %>%
+  group_by(name) %>%
+  mutate(lag0 = lag(visits),
+         lag1 = lag(lag0),
+         lag2 = lag(lag1),
+         lag3 = lag(lag2),
+         lag4 = lag(lag3),
+         lag5 = lag(lag4),
+         lag6 = lag(lag5),
+         lag7 = lag(lag6),
+         lag8 = lag(lag7),
+         lag9 = lag(lag8),
+         lag10 = lag(lag9),
+         lag11 = lag(lag10),
+         lag12 = lag(lag11),
+         lag13 = lag(lag12)) %>%
+  mutate(pct0 = (lag0 - visits) / visits,
+         pct1 = (lag1 - lag0) / lag0,
+         pct2 = (lag2 - lag1) / lag1,
+         pct3 = (lag3 - lag2) / lag2,
+         pct4 = (lag4 - lag3) / lag3,
+         pct5 = (lag5 - lag4) / lag4,
+         pct6 = (lag6 - lag5) / lag5) %>%
+  drop_na() %>%
+  ungroup() %>%
+  group_by(date, name) %>%
+  mutate(raw_change = (lag0 + lag1 + lag2 + lag3 + lag4 + lag5 + lag6 + lag7 + lag8 + lag9 + lag10 + lag11 + lag12 + lag13) / 14,
+         pct_change = (pct0 + pct1 + pct2 + pct3 + pct4 + pct5 + pct6) / 7) %>%
+  select(date, name, pct_change, raw_change) %>%
+  ungroup() %>%
+  ggplot(aes(x = as_date(date), y = raw_change)) +
+  geom_line(colour = pal[1], size = 1) +
+  facet_geo(~ name, grid = filter(facet, name != "Port Richmond"), scales = 'free_y') +
+  xlab("") +
+  ylab("") +
+  labs(title = "7-Day rolling average", subtitle = "Weekly chnange by neighborhood") +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = 'transparent', colour = 'transparent'),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.line.x = element_line(size = 0.5, colour = 'black'),
+        axis.line.y = element_blank(),
+        axis.ticks.x = element_line(size = 0.5, colour = 'black'),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(face = 'bold'),
+        axis.text.y = element_blank(),
+        plot.title = element_text(face = 'bold', colour = 'black', hjust = 0.5),
+        plot.subtitle =  element_text(face = 'plain', colour = 'black', size = 15, hjust = 0.5),
+        strip.text = element_text(face = 'bold', colour = 'black'),
+        plot.margin = margin(20, 20, 20, 20)) + 
+  ggsave("changexrolling.png", height = 20, width = 20, dpi = 300)
+
+joint %>%
+  mutate(week = week(date)) %>%
+  group_by(name, week) %>%
+  summarise(visits = mean(visits)) %>%
+  ungroup() %>%
+  drop_na() %>%
+  ggplot(aes(x = ymd("2020-01-01") + weeks(week - 1), y = visits)) +
+  geom_line(colour = pal[1], size = 1) +
+  geom_line(data = joint %>%
+              mutate(week = week(date)) %>%
+              group_by(name, week) %>%
+              summarise(visits = mean(visits)) %>%
+              ungroup() %>%
+              drop_na() %>%
+              group_by(week) %>%
+              summarise(visits = mean(visits)),
+            aes(x = ymd("2020-01-01") + weeks(week - 1), y = visits),
+            colour = '#707070', size = 1, linetype = 2) +
+  facet_geo(~ name, grid = filter(facet, name != "Port Richmond"), scales = 'free_y') +
+  xlab("") +
+  ylab("") +
+  labs(title = "7-Day Rolling Average by Neighborhood", subtitle = "Weekly visit trends against city average",
+       caption = "Dashed line is the mean change in travel across all neighborhoods") +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = 'transparent', colour = 'transparent'),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.line.x = element_line(size = 0.5, colour = 'black'),
+        axis.line.y = element_blank(),
+        axis.ticks.x = element_line(size = 0.5, colour = 'black'),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(face = 'bold'),
+        axis.text.y = element_blank(),
+        plot.title = element_text(face = 'bold', colour = 'black', hjust = 0.5),
+        plot.subtitle =  element_text(face = 'plain', colour = 'black', size = 15, hjust = 0.5),
+        strip.text = element_text(face = 'bold', colour = 'black'),
+        plot.margin = margin(20, 20, 20, 20)) + 
+  ggsave("changexrolling.png", height = 20, width = 20, dpi = 300)
 
 ##
 

@@ -7,7 +7,8 @@
 ## Palettes
 
 # Base
-pal <- read_csv("https://github.com/asrenninger/philamonitor/raw/master/miscellany/pal.txt", col_names = FALSE) %>% pull(X1)
+pal <- read_csv("https://raw.githubusercontent.com/asrenninger/palettes/master/grered.txt", col_names = FALSE) %>% pull(X1)
+show_col(pal)
 
 ## Themes
 
@@ -154,7 +155,7 @@ guide_discrete <-
 # Correlation Plotting
 correlate <- function(correlations, name) {
   
-  mat <- round(cor(correlations), 2)
+  mat <- round(correlations, 2)
   
   ##
   
@@ -175,22 +176,25 @@ correlate <- function(correlations, name) {
   
   ##
   
+  library(scales)
+  
   ggheatmap <- 
     ggplot(data = na.omit(melted_mat), aes(Var2, Var1, fill = value)) +
-    geom_tile(color = "white") +
-    scale_colour_scico(palette = 'cork', direction = -1,
-                       guide = 'none') +
-    scale_fill_scico(palette = 'cork',
-                     limit = c(-1,1), 
-                     name = "pearson\ncorrelation",
-                     guide = guide_colorbar(direction = "vertical",
-                                            barheight = unit(50, units = "mm"),
-                                            barwidth = unit(2, units = "mm"),
-                                            draw.ulim = FALSE,
-                                            title.position = 'left',
-                                            label.position = 'right',
-                                            title.hjust = 0.5,
-                                            label.hjust = 0.5)) +
+    geom_tile(color = 'white') +
+    scale_colour_gradientn(colours = pal, guide = 'none') +
+    scale_fill_gradientn(colours = rev(pal),
+                         limit = c(0.4, 0.5), 
+                         breaks = c(0.4, 0.45, 0.5),
+                         name = "pearson\ncorrelation",
+                         oob = squish,
+                         guide = guide_colorbar(direction = "vertical",
+                                                barheight = unit(50, units = "mm"),
+                                                barwidth = unit(2, units = "mm"),
+                                                draw.ulim = FALSE,
+                                                title.position = 'left',
+                                                label.position = 'right',
+                                                title.hjust = 0.5,
+                                                label.hjust = 0.5)) +
     theme_minimal() +
     theme(legend.text = element_text(angle = 90),
           legend.title = element_text(angle = 90),
@@ -215,7 +219,7 @@ correlate <- function(correlations, name) {
   
   ggmatrix <- 
     ggheatmap +
-    geom_text(aes(Var2, Var1, label = value, colour = value), size = 3) 
+    geom_text(aes(Var2, Var1, label = value, colour = 'white'), size = 3, fontface = 'bold') 
   
   ggsave(ggmatrix, filename = name, height = 8, width = 8, dpi = 300)
   

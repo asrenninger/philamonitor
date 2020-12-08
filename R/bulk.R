@@ -46,7 +46,7 @@ library(tigris)
 ##
 
 states <- unique(fips_codes$state)[1:51]
-target <- states[str_detect(states, "AL|MS|LA|TX|FL")]
+target <- states[str_detect(states, "MS|LA|TX|AR")]
 
 tracts <-
   reduce(
@@ -104,9 +104,12 @@ map_df(files, vroom) %>%
 
 ##
 
-nums <- str_pad(paste(7:10), width = 2, pad = "0", side = 'left')
+nums <- str_pad(paste(8:10), width = 2, pad = "0", side = 'left')
 
 ##
+
+tracts <- read_sf("~/Desktop/R/git/cloud/final-project-al-jalil-andrew/data/relevant_tracts.geojson") %>% glimpse()
+
 
 map(nums, function(x){
   trail <- glue("data/patterns_2020_weekly/2020/{x}")
@@ -117,7 +120,7 @@ map(nums, function(x){
   
   map_df(files, function(x){
     vroom(x) %>%
-      filter(str_sub(poi_cbg, 1, 11) %in% tracts$GEOID)
+      filter(str_sub(poi_cbg, 1, 11) %in% tracts$geo_id)
   }) %>% 
     write_csv(glue("2020_{x}.csv"))
   
