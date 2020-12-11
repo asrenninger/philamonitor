@@ -180,11 +180,11 @@ correlate <- function(correlations, name) {
   
   ggheatmap <- 
     ggplot(data = na.omit(melted_mat), aes(Var2, Var1, fill = value)) +
-    geom_tile(color = 'white') +
+    geom_tile(color = "white") +
     scale_colour_gradientn(colours = pal, guide = 'none') +
     scale_fill_gradientn(colours = rev(pal),
-                         limit = c(0.4, 0.5), 
-                         breaks = c(0.4, 0.45, 0.5),
+                         limit = c(0.5, 1), 
+                         breaks = c(0.5, 0.75, 1),
                          name = "pearson\ncorrelation",
                          oob = squish,
                          guide = guide_colorbar(direction = "vertical",
@@ -219,7 +219,7 @@ correlate <- function(correlations, name) {
   
   ggmatrix <- 
     ggheatmap +
-    geom_text(aes(Var2, Var1, label = value, colour = 'white'), size = 3, fontface = 'bold') 
+    geom_text(aes(Var2, Var1, label = value, colour = value), size = 3, fontface = 'bold') 
   
   ggsave(ggmatrix, filename = name, height = 8, width = 8, dpi = 300)
   

@@ -72,6 +72,7 @@ cents <-
 
 ready <- 
   unimo %>% 
+  filter(cbg %in% shape$GEOID) %>%
   group_by(month) %>% 
   group_split()
 
@@ -99,7 +100,9 @@ centraliser <-
     cents <- 
       tibble(GEOID = V(graph)$name,
              evc = evcent(graph)$vector, 
-             deg = degree(graph), 
+             deg = degree(graph, loops = FALSE),
+             ind = degree(graph, mode = "in", loops = FALSE),
+             out = degree(graph, mode = "out", loops = FALSE),
              bet = betweenness(graph, weights = E(graph)$weight, normalized = TRUE), 
              clo = closeness(graph, weights =  E(graph)$weight),
              ecc = eccentricity(graph),
@@ -510,10 +513,10 @@ for (i in 1:8) {
 anim <- 
   ggplot(data = cents, aes(x = deg, colour = factor(month))) +
   stat_ecdf(size = 2) +
-  scale_color_manual(values = pal[3:11], name = 'month', guide = guide_discrete) +
+  scale_color_manual(values = pal, name = 'month', guide = guide_discrete) +
   scale_x_log10() +
   ylab("") +
-  xlab("degree centrality (log)") +
+  xlab("degree centrality") +
   labs(title = "Changing Degrees", subtitle = "Cumulative probability in {stamp[current_frame]}") +
   theme_ver() +
   theme(legend.position = 'bottom') +
@@ -525,4 +528,54 @@ anim_save("ecdf.gif", animation = anim,
           height = 600, width = 800, nframes = 12, fps = 1,
           start_pause = 2, end_pause = 2)
 
+ggplot(data = cents, aes(x = deg, colour = factor(month))) +
+  stat_ecdf(size = 2, alpha = 0.75) +
+  scale_color_manual(values = pal, name = 'month', guide = guide_discrete) +
+  scale_x_log10() +
+  ylab("cummulative probability") +
+  xlab("degree centrality") +
+  theme_ver() +
+  theme(legend.position = 'bottom') +
+  ggsave("ecdf.png", height = 6, width = 6, dpi = 300)
+
 ## 
+
+library(gt)
+
+##
+
+wide <- 
+  race %>% 
+  select(GEOID, variable, value) %>%
+  st_drop_geometry() %>% 
+  pivot_wider(id_cols = GEOID, names_from = variable, values_from = value) %>%
+  transmute(GEOID = GEOID,
+            white = white,
+            nonwhite = black + hispanic)
+
+race_split <- 
+  cents %>% 
+  transmute(GEOID = GEOID, month = month, infomap = inf) %>%
+  left_join(wide) %>%
+  group_by(month, infomap) %>%
+  summarise(white = sum(white),
+            nonwhite = sum(nonwhite)) %>%
+  ungroup() %>%
+  group_by(month) %>%
+  group_split()
+
+list <- 
+  purrr::map(race_split, function(x){
+    MLID::id(as.data.frame(x), vars = c("nonwhite", "white")) %>% magrittr::extract2(1)
+  })
+
+cents %>%
+  group_by(inf, month) %>%
+  summarise(n = n()) %>%
+  ungroup() %>%
+  group_by(month) %>%
+  summarise(max = max(n),
+            min = min(n),
+            mean = mean(n)) %>%
+  mutate(index = reduce(list, c)) %>%
+  gt()
