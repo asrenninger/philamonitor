@@ -122,4 +122,4 @@ In March, at the onset of the pandemic, more Philadelphians were leaving their h
 
 The purpose of this report is to examine mobility patterns in Philadelphia before and during the pandemic using cell phone mobility data provided by SafeGraph. The visualizations built from these data show large declines in mobility at the onset of the pandemic. While we cannot access economic indicators for particular neighborhoods and businesses throughout the City, as a proxy, these mobility data suggest that many industries and corridors have experienced a tremendous loss in economic activity in recent months.
 
-The next stage of this work is to develop interactive, web-based visualizations that can help stakeholders in Philadelphia understand and prepare for changing mobility patterns as the City begins to return to a new normal in 2022.
+The next stage of this work is to develop some interactive, web-based visualizations that can help stakeholders in Philadelphia understand and plan for a return to 'normal' mobility patterns.

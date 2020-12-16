@@ -282,10 +282,9 @@ businesses throughout the City, as a proxy, these mobility data suggest
 that many industries and corridors have experienced a tremendous loss in
 economic activity in recent months.
 
-The next stage of this work is to develop interactive, web-based
+The next stage of this work is to develop some interactive, web-based
 visualizations that can help stakeholders in Philadelphia understand and
-prepare for changing mobility patterns as the City begins to return to a
-new normal in 2022.
+plan for a return to ‘normal’ mobility patterns.
 
 [1] If that description contains “restaurant” or “bar”, we classify that
 as leisure. Anything educational, from tutoring to public, private or
