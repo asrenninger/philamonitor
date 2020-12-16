@@ -291,7 +291,7 @@ cross <-
 
 joint <- 
   moves %>%
-  mutate(month = lubridate::month(date_range_start, label = TRUE)) %>%
+  mutate(month = lubridate::month(date_range_start, label = TRUE, abbr = FALSE)) %>%
   group_by(safegraph_place_id, month) %>%
   summarise(visits = sum(raw_visit_counts)) %>%
   left_join(cross) %>%
@@ -311,7 +311,7 @@ ggplot(joint) +
                     name = "visits",
                     guide = guide_discrete) +
   facet_wrap(~ month, nrow = 2) +
-  labs(title = 'Time-Space Patterns', subtitle = "Movement aggregated to 500 meter squared cells") +
+  #labs(title = 'Time-Space Patterns', subtitle = "Movement aggregated to 500 meter squared cells") +
   theme_map() +
   theme(legend.position = 'bottom') +
   ggsave("grid.png", height = 12, width = 14, dpi = 300)
@@ -458,10 +458,11 @@ anim <-
   geom_sf(data = background, 
           aes(), fill = NA, colour = '#000000', lwd = 0.5) +
   geom_point(data = datum, aes(x = X, y = Y, size = visits, colour = type), alpha = 0.5) +
-  scale_size_continuous(range = c(1, 8)) +
+  scale_size_continuous(range = c(1, 8), name = 'visits this year') +
   scale_colour_manual(values = c('#000000', pal),
                       guide = 'none') + 
-  labs(title = "Points of Interest", subtitle = "{current_frame}") +
+  labs(#title = "Points of Interest", 
+       subtitle = "{current_frame}") +
   transition_manual(location_name) +
   ease_aes() + 
   theme_map() +
@@ -470,7 +471,7 @@ anim <-
 anim_save("businesses.gif", animation = anim, 
           height = 800, width = 600, fps = 1)
 
-##
+ ##
 
 parks <- c("Rittenhouse Square", "Logan Square", "Franklin Square", "Washington Square")
 
@@ -511,7 +512,7 @@ comcast <-
 
 datum <- 
   odmat %>%
-  mutate(month = lubridate::month(start, label = TRUE)) %>% 
+  mutate(month = lubridate::month(start, label = TRUE, abbr = FALSE)) %>% 
   filter(safegraph_place_id %in% comcast$safegraph_place_id) %>% 
   left_join(comcast) %>% 
   select(location_name, safegraph_place_id, cbg, visits, month, geocode1) %>%
@@ -544,7 +545,7 @@ ggplot() +
                        guide = guide_continuous) +
   scale_size_continuous(range = c(0.1, 1), guide = 'none') +
   facet_wrap(~ month, nrow = 1) +
-  labs(title = 'Visitors to the Comcast Center', subtitle = "Devices by neighborhood of origin") +
+  #labs(title = 'Visitors to the Comcast Center', subtitle = "Devices by neighborhood of origin") +
   theme_map() +
   theme(legend.position = 'bottom') +
   ggsave("comcast.png", height = 4, width = 14, dpi = 300)
@@ -558,7 +559,7 @@ reading <-
 
 datum <- 
   odmat %>%
-  mutate(month = month(start, label = TRUE)) %>% 
+  mutate(month = month(start, label = TRUE, abbr = FALSE)) %>% 
   filter(safegraph_place_id %in% reading$safegraph_place_id) %>% 
   left_join(reading) %>% 
   select(location_name, safegraph_place_id, cbg, visits, month, geocode1) %>%
@@ -591,10 +592,110 @@ ggplot() +
                          guide = guide_continuous) +
   scale_size_continuous(range = c(0.1, 1), guide = 'none') +
   facet_wrap(~ month, nrow = 1) +
-  labs(title = 'Visitors to Reading Terminal', subtitle = "Devices by neighborhood of origin") +
+  #labs(title = 'Visitors to Reading Terminal', subtitle = "Devices by neighborhood of origin") +
   theme_map() +
   theme(legend.position = 'bottom') +
   ggsave("market.png", height = 4, width = 14, dpi = 300)
+
+##
+
+target <- 
+  phila %>% 
+  filter(str_detect(location_name, "Target")) %>%
+  rename(geocode1 = GEOID)
+
+datum <- 
+  odmat %>%
+  mutate(month = month(start, label = TRUE, abbr = FALSE)) %>% 
+  filter(safegraph_place_id %in% target$safegraph_place_id) %>% 
+  left_join(target) %>% 
+  select(location_name, safegraph_place_id, cbg, visits, month, geocode1) %>%
+  rename(GEOID = cbg) %>% 
+  left_join(shape) %>%
+  drop_na(ALAND, AWATER) %>% 
+  st_as_sf()
+
+datum <- 
+  datum %>% 
+  transmute(geocode1 = geocode1,
+            geocode2 = GEOID,
+            visits = visits,
+            month = month) %>%
+  st_drop_geometry()
+
+glimpse(datum)
+glimpse(shape)
+
+lines <- stplanr::od2line(flow = datum, zones = transmute(shape, geocode = GEOID))
+
+##
+
+ggplot() +
+  geom_sf(data = background, 
+          aes(), fill = NA, colour = '#000000', lwd = 0.5) +
+  geom_sf(data = lines %>% 
+            arrange(desc(visits)), aes(colour = visits, lwd = visits), alpha = 0.5) +
+  scale_colour_gradientn(colors = rev(pal),
+                         name = "visits",
+                         limits = c(0, 500),
+                         breaks = c(100, 200, 300, 400),
+                         guide = guide_continuous) +
+  scale_size_continuous(range = c(0.1, 1), guide = 'none') +
+  facet_wrap(~ month, nrow = 1) +
+  #labs(title = 'Visitors to Reading Terminal', subtitle = "Devices by neighborhood of origin") +
+  theme_map() +
+  theme(legend.position = 'bottom') +
+  ggsave("target.png", height = 4, width = 14, dpi = 300)
+
+##
+
+fitness <- 
+  phila %>% 
+  filter(str_detect(location_name, "Planet Fitness")) %>%
+  rename(geocode1 = GEOID)
+
+datum <- 
+  odmat %>%
+  mutate(month = month(start, label = TRUE, abbr = FALSE)) %>% 
+  filter(safegraph_place_id %in% fitness$safegraph_place_id) %>% 
+  left_join(fitness) %>% 
+  select(location_name, safegraph_place_id, cbg, visits, month, geocode1) %>%
+  rename(GEOID = cbg) %>% 
+  left_join(shape) %>%
+  drop_na(ALAND, AWATER) %>% 
+  st_as_sf()
+
+datum <- 
+  datum %>% 
+  transmute(geocode1 = geocode1,
+            geocode2 = GEOID,
+            visits = visits,
+            month = month) %>%
+  st_drop_geometry()
+
+glimpse(datum)
+glimpse(shape)
+
+lines <- stplanr::od2line(flow = datum, zones = transmute(shape, geocode = GEOID))
+
+##
+
+ggplot() +
+  geom_sf(data = background, 
+          aes(), fill = NA, colour = '#000000', lwd = 0.5) +
+  geom_sf(data = lines %>% 
+            arrange(desc(visits)), aes(colour = visits, lwd = visits), alpha = 0.5) +
+  scale_colour_gradientn(colors = rev(pal),
+                         name = "visits",
+                         limits = c(0, 500),
+                         breaks = c(100, 200, 300, 400),
+                         guide = guide_continuous) +
+  scale_size_continuous(range = c(0.1, 1), guide = 'none') +
+  facet_wrap(~ month, nrow = 1) +
+  #labs(title = 'Visitors to Reading Terminal', subtitle = "Devices by neighborhood of origin") +
+  theme_map() +
+  theme(legend.position = 'bottom') +
+  ggsave("fitness.png", height = 4, width = 14, dpi = 300)
 
 ##
 
@@ -672,10 +773,10 @@ ggplot() +
                        oob = squish) +
   scale_size_continuous(range = c(0, 6), guide = 'none') +
   facet_wrap(~ type, nrow = 2) + 
-  labs(title = "Points of Interest", subtitle = "Venues density use category") +
+  #labs(title = "Points of Interest", subtitle = "Venues density use category") +
   theme_map() +
   theme(legend.position = 'bottom') +
-  ggsave("split.png", height = 6, width = 8, dpi = 300)
+  ggsave("split_clean.png", height = 6, width = 8, dpi = 300)
 
 ##
 
@@ -723,7 +824,7 @@ moves %>%
   geom_path(aes(group = type), size = 1) +
   scale_colour_manual(values = c(pal, '#000000'),
                       name = "type of venue") +
-  labs(title = "Tracking Activity", subtitle = "Venues by category") +
+  #labs(title = "Tracking Activity", subtitle = "Venues by category") +
   xlab("") +
   theme_hor() +
   ggsave("seriesxtype.png", height = 4, width = 8, dpi = 300)

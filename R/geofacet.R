@@ -54,8 +54,7 @@ hoods <-
                           str_detect(mapname, "Penrose|Clearview") ~ "Eastwick", 
                           str_detect(mapname, "Woodland") ~ "University City",
                           str_detect(mapname, "Germantown|Wister") ~ "Germantwon",
-                          str_detect(mapname, "Mechanicsville") ~ "Parkwood Manor",
-                          str_detect(mapname, "Crestmont Farms") ~ "Franklin Mills",
+                          str_detect(mapname, "Crestmont Farms|Parkwood Manor|Mechanicsville") ~ "Franklin Mills",
                           str_detect(mapname, "Haverford") ~ "Belmont",
                           str_detect(mapname, "Garden Court") ~ "Walnut Hill",
                           str_detect(mapname, "Southwest Schuylkill") ~ "Bartram Village",
@@ -224,7 +223,7 @@ joint %>%
   facet_geo(~ name, grid = filter(facet, name != "Port Richmond"), scales = 'free_y') +
   xlab("") +
   ylab("") +
-  labs(title = "7-Day Rolling Average by Neighborhood", subtitle = "Weekly visit trends against city average",
+  labs(#title = "7-Day Rolling Average by Neighborhood", subtitle = "Weekly visit trends against city average",
        caption = "Dashed line is the mean change in travel across all neighborhoods") +
   theme_minimal() +
   theme(plot.background = element_rect(fill = 'transparent', colour = 'transparent'),

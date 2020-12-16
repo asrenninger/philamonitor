@@ -443,6 +443,11 @@ top10 %>%
 
 ##
 
+corridors %>% 
+  filter(corridor == "Market East" | corridor == "Market West") %>% 
+  group_by(corridor) %>% 
+  summarise()
+
 ggplot(ready %>%
          group_by(corridor) %>%
          summarise(high = max(visits),
@@ -457,6 +462,15 @@ ggplot(ready %>%
   geom_sf(aes(fill = factor(ntile(change, 9))), 
           lwd = 0,
           colour = NA) +
+  geom_sf(data =
+            corridors %>% 
+            filter(corridor == "Market East" | corridor == "Market West") %>% 
+            group_by(corridor) %>% 
+            summarise(),
+          aes(), 
+          lwd = 1,
+          fill = NA, 
+          colour = '#070707') +  
   coord_sf(crs = 3702) +
   scale_fill_manual(values = pal,
                     labels = as.character(round(quantile(ready %>%
@@ -469,9 +483,9 @@ ggplot(ready %>%
                                                            pull(change),
                                                          c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
                                                          na.rm = TRUE))),
-                    name = "% change",
+                    name = "% change from high mark to most recent month",
                     guide = guide_discrete) +
-  labs(title = 'Leisure Corridors', subtitle = "Clusters of restaurants and bars") +
+  #labs(title = 'Leisure Corridors', subtitle = "Clusters of restaurants and bars") +
   theme_map() +
   theme(legend.position = 'bottom') +
   ggsave("corridors.png", height = 12, width = 14, dpi = 300)

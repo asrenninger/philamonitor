@@ -207,7 +207,7 @@ base <-
   labs(fill = NULL) +  
   labs(x = 'activity (visits)') +  
   labs(y = "") +
-  labs(title = "Brand Popularity", subtitle = "Changes throughout the pandemic") +
+  #labs(title = "Brand Popularity", subtitle = "Changes throughout the pandemic") +
   theme_rot() +
   theme(axis.text.y = element_blank())
 

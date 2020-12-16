@@ -141,12 +141,12 @@ ggplot() +
   scale_fill_gradientn(colours = rev(pal), 
                        guide = guide_continuous) +
   facet_grid(variable ~ label) +
-  labs(title = "Communities by Month",
-       subtitle = "Detected mobility clusters over demographic compositon") + 
+  #labs(title = "Communities by Month",
+  #     subtitle = "Detected mobility clusters over demographic compositon") + 
   theme_map() +
   theme(legend.position = 'bottom',
         strip.text.y = element_text(angle = 270)) + 
-  ggsave("communitiesxrace.png", height = 8, width = 11, dpi = 300)
+  ggsave("communitiesxrace_clean.png", height = 8, width = 11, dpi = 300)
 
 ##
 
@@ -577,5 +577,148 @@ cents %>%
   summarise(max = max(n),
             min = min(n),
             mean = mean(n)) %>%
-  mutate(index = reduce(list, c)) %>%
-  gt()
+  mutate(`dissimilarity index` = reduce(list, c)) %>%
+  gt() %>% 
+  #tab_header(title = html("<b>Community Size by Month</b>"),
+  #           subtitle = md("How segregation and community bounds relate<br><br>")) %>%
+  #tab_source_note(source_note = md("**Data**: SafeGraph / Census Bureau | **Note**: Period spanning January to August 2020"))  %>% 
+  tab_style(style = list(cell_text(weight = "bold")),
+            locations = cells_column_labels(vars(`month`))) %>% 
+  data_color(columns = vars(`dissimilarity index`),
+             colors = scales::col_numeric(rev(pal), domain = NULL)) %>% 
+  cols_align(align = "center",
+             columns = 2:5) %>% 
+  opt_table_font(font = list(c("IBM Plex Sans"))) %>% 
+  tab_options(heading.title.font.size = 30,
+              heading.subtitle.font.size = 15,
+              heading.align = "left",
+              table.border.top.color = "white",
+              heading.border.bottom.color = "white",
+              table.border.bottom.color = "white",
+              column_labels.border.bottom.color = "grey",
+              column_labels.border.bottom.width= px(1)) %>% 
+  gtsave("dissimilarity.png", expand = 10)
+
+##
+
+density <- 
+  purrr::map(ready, function(x){
+    
+    edges <- 
+      x %>%
+      transmute(from = cbg,
+                to = poi_cbg, 
+                weight = visits)
+    
+    nodes <- 
+      shape %>%
+      transmute(cbg = shape$GEOID) %>%
+      st_drop_geometry()
+    
+  graph <- 
+    edges %>%
+    graph_from_data_frame(vertices = nodes, directed = TRUE) %>%
+    set_edge_attr("weight", value = edges$weight)
+  
+  return(igraph::graph.density(graph, loop = FALSE))
+  })
+
+diameter <- 
+  purrr::map(ready, function(x){
+    
+    edges <- 
+      x %>%
+      transmute(from = cbg,
+                to = poi_cbg, 
+                weight = visits)
+    
+    nodes <- 
+      shape %>%
+      transmute(cbg = shape$GEOID) %>%
+      st_drop_geometry()
+    
+    graph <- 
+      edges %>%
+      graph_from_data_frame(vertices = nodes, directed = TRUE) %>%
+      set_edge_attr("weight", value = edges$weight)
+    
+    return(igraph::diameter(graph))
+  })
+
+tibble(month = stamp,
+       diameter = reduce(diameter, c),
+       density = reduce(density, c)) %>%
+  gt() %>%
+  tab_style(style = list(cell_text(weight = "bold")),
+            locations = cells_column_labels(vars(`month`))) %>%
+  gtsave("density.png", expand = 10)
+
+##
+
+
+library(sna)
+
+##
+
+zeros <- array(dim = c(8, 1336, 1336))
+
+##
+
+for (i in 1:8) {
+  
+  edges <- 
+    ready[[i]] %>%
+    transmute(from = cbg,
+              to = poi_cbg, 
+              weight = visits) %>%
+    filter(from %in% shape$GEOID) %>%
+    arrange(to, from)
+  
+  adjacencies <- 
+    edges %>%
+    graph_from_data_frame(vertices = nodes, directed = FALSE) %>%
+    set_edge_attr("weight", value = edges$weight) %>% 
+    as_adjacency_matrix(attr = "weight") %>% 
+    as.matrix()
+  
+  zeros[i, , ] <- adjacencies
+  
+}
+
+##
+
+months <- odmat %>% pull(start) %>% lubridate::month(label = TRUE, abbr = FALSE) %>% unique()
+
+##
+
+correlations <- sna::gcor(zeros)
+
+mean(correlations[lower.tri(correlations)])
+min(correlations[lower.tri(correlations)])
+max(correlations[lower.tri(correlations)])
+
+unique(correlations[lower.tri(correlations)])
+
+##
+
+rownames(correlations) <- months[1:8]
+colnames(correlations) <- months[1:8]
+
+##
+
+correlate(correlations, "testing.png")
+
+qap <- qaptest(list(zeros[1, , ], zeros[4, , ]), gcor, g1=1, g2=2, reps=1000)
+
+ggplot() +
+  geom_histogram(aes(qap$dist), bins = 500, fill = '#707070') +
+  geom_vline(xintercept = unique(correlations[lower.tri(correlations)]), colour = pal[1], linetype = 2, size = 0.5) +
+  geom_text(aes(x = 0.575, y = 100, label = "observed"), angle = 90, fontface = 'bold', colour = pal[1]) +
+  xlab("permuted correlations") +
+  ylab("") +
+  theme_hor() +
+  ggsave("qap.png", height = 4, width = 6, dpi = 300)
+
+plot(test)
+
+##

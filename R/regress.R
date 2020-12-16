@@ -447,6 +447,10 @@ in_summary <-
 
 ##
 
+library(gt)
+
+##
+
 gt(data = bind_rows(in_summary, out_summary), rowname_col = "variable", groupname_col = "group") %>%
   data_color(
     columns = vars(`sign`),
